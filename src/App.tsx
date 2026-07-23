@@ -7,7 +7,7 @@ import {
   MagnifyingGlass, House, Tray, Question, UploadSimple,
   FolderOpen, Eye, DownloadSimple, EnvelopeSimple, X,
   DotsThree, Plus, Diamond, ShareNetwork, ShoppingBag,
-  Scissors, Ruler, TextT, ImageSquare, Broom, Info, Crop, CaretLeft
+  Scissors, Ruler, TextT, ImageSquare, Broom, Info, Crop, CaretLeft, ArrowRight
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
@@ -385,7 +385,7 @@ export default function App() {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col bg-white rounded-lg border border-slate-200">
+                  <div className="flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden">
                     {/* Table Header */}
                     <div className="flex items-center gap-6 px-6 py-3 bg-slate-100 border-b border-slate-200 text-xs font-semibold text-slate-500">
                       <div className="w-6 shrink-0"></div>
@@ -403,7 +403,7 @@ export default function App() {
                           {dateLabel.startsWith('Today') ? 'Today' : dateLabel.startsWith('Yesterday') ? 'Yesterday' : dateLabel}
                         </div>
                         {groupImages.map((img) => (
-                          <div key={img.id} className={`flex items-center gap-6 px-6 py-3 border-b border-slate-100 last:border-b-0 transition-all cursor-pointer ${img.selected ? 'bg-[#ecf7f8]' : 'bg-white hover:bg-slate-50'}`} onClick={() => toggleSelect(img.id)}>
+                          <div key={img.id} className={`relative flex items-center gap-6 px-6 py-3 border-b border-slate-100 last:border-b-0 transition-all cursor-pointer ${img.selected ? 'bg-[#ecf7f8]' : 'bg-white hover:bg-slate-50'} ${openMenuId === img.id ? 'z-50' : 'z-10'}`} onClick={() => toggleSelect(img.id)}>
                             <div className={`w-6 h-6 rounded border flex items-center justify-center shrink-0 ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0]' : 'bg-white border-slate-500'}`}>
                               {img.selected && <Check size={16} weight="bold" className="text-white" />}
                             </div>
@@ -834,7 +834,7 @@ export default function App() {
                 animate={{ x: 0 }}
                 exit={{ x: '100%' }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="w-[440px] bg-white h-full shadow-[-10px_0_40px_rgba(0,0,0,0.15)] flex flex-col z-10"
+                className="w-[480px] bg-white h-full shadow-[-10px_0_40px_rgba(0,0,0,0.15)] flex flex-col z-10"
                 onClick={e => e.stopPropagation()}
               >
                 <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
@@ -851,40 +851,75 @@ export default function App() {
                       <div className="flex items-center gap-2 text-sm">
                         <div className="bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-semibold text-xs border border-yellow-200">
                           <Diamond size={14} weight="fill" className="text-yellow-600" />
-                          22 <span className="font-medium opacity-80">credits</span>
+                          22 <span className="font-medium opacity-80">Available credits</span>
                         </div>
                         <button className="text-[#1cb0b0] font-semibold hover:underline text-xs">Recharge</button>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2">
-                    {/* Model Image Card */}
-                    <div className="border border-[#e2e8f0] bg-[#f8fafc] hover:bg-[#f1f5f9] hover:border-[#cbd5e1] rounded-2xl p-3 flex flex-col items-center text-center cursor-pointer transition-all shadow-sm hover:shadow">
-                      <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden shadow-sm mb-3">
-                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&q=80" className="w-full h-full object-cover" alt="Model" />
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Model Image Card */}
+                      <div className="border border-[#e2e8f0] bg-[#f8fafc] hover:bg-[#f1f5f9] hover:border-[#cbd5e1] rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
+                        <div className="relative w-full aspect-[4/3] shrink-0 rounded-md overflow-hidden mb-2.5">
+                          <img src="/img2.jpg" className="w-full h-full object-cover" alt="Model" />
+                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#fde047] shadow-sm flex items-center gap-1 backdrop-blur-sm">
+                            <Diamond size={10} weight="fill" className="text-[#ca8a04]" />
+                            1 credit
+                          </div>
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-[15px] leading-snug mb-0.5">Model Image</h3>
+                        <p className="text-[11px] text-slate-500 leading-tight">Create hyper-realistic model image</p>
                       </div>
-                      <h3 className="font-semibold text-slate-900 text-[13px] leading-snug mb-1">Model Image</h3>
-                      <p className="text-[11px] text-slate-500 leading-tight">Create hyper-realistic model image</p>
-                    </div>
 
-                    {/* Change Gold Color Card */}
-                    <div className="border border-[#e2e8f0] bg-[#fdf8f6] hover:bg-[#faeee7] hover:border-[#f97316]/30 rounded-2xl p-3 flex flex-col items-center text-center cursor-pointer transition-all shadow-sm hover:shadow">
-                      <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-white shadow-sm flex items-center justify-center p-1.5 border border-slate-100 mb-3">
-                        <img src={MOCK_IMAGES[0].url} className="w-full h-full object-contain" alt="Gold Color" />
+                      {/* Change Color Card */}
+                      <div className="border border-[#e2e8f0] bg-[#fdf8f6] hover:bg-[#faeee7] hover:border-[#f97316]/30 rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
+                        <div className="relative w-full aspect-[4/3] shrink-0 rounded-md overflow-hidden bg-white flex items-center justify-center p-1.5 border border-slate-100 mb-2.5">
+                          <img src="/img1.jpg" className="w-full h-full object-contain" alt="Change Color" />
+                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#fde047] shadow-sm flex items-center gap-1 backdrop-blur-sm">
+                            <Diamond size={10} weight="fill" className="text-[#ca8a04]" />
+                            1 credit
+                          </div>
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-[15px] leading-snug mb-0.5">Change color</h3>
+                        <p className="text-[11px] text-slate-500 leading-tight">Change gold color to silver, yellow, or rose</p>
                       </div>
-                      <h3 className="font-semibold text-slate-900 text-[13px] leading-snug mb-1">Gold Color</h3>
-                      <p className="text-[11px] text-slate-500 leading-tight">Change gold color to silver, yellow, or rose</p>
-                    </div>
 
-                    {/* Lifestyle Image Card */}
-                    <div className="border border-[#fecdd3]/40 bg-[#fff1f2]/50 hover:bg-[#fff1f2] hover:border-[#fecdd3] rounded-2xl p-3 flex flex-col items-center text-center cursor-pointer transition-all shadow-sm hover:shadow">
-                      <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden shadow-sm mb-3">
-                        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=300&q=80" className="w-full h-full object-cover" alt="Lifestyle" />
+                      {/* Lifestyle Image Card */}
+                      <div className="border border-[#fecdd3]/40 bg-[#fff1f2]/50 hover:bg-[#fff1f2] hover:border-[#fecdd3] rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
+                        <div className="relative w-full aspect-[4/3] shrink-0 rounded-md overflow-hidden mb-2.5">
+                          <img src="/img3.jpg" className="w-full h-full object-cover" alt="Lifestyle" />
+                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#fde047] shadow-sm flex items-center gap-1 backdrop-blur-sm">
+                            <Diamond size={10} weight="fill" className="text-[#ca8a04]" />
+                            1 credit
+                          </div>
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-[15px] leading-snug mb-0.5">Lifestyle</h3>
+                        <p className="text-[11px] text-slate-500 leading-tight">Place jewelry in natural environments</p>
                       </div>
-                      <h3 className="font-semibold text-slate-900 text-[13px] leading-snug mb-1">Lifestyle</h3>
-                      <p className="text-[11px] text-slate-500 leading-tight">Place jewelry in natural environments</p>
+
+                      {/* Model Video Card */}
+                      <div className="border border-[#e2e8f0] bg-[#f0f9ff] hover:bg-[#e0f2fe] hover:border-[#bae6fd] rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
+                        <div className="relative w-full aspect-[4/3] shrink-0 rounded-md overflow-hidden mb-2.5 bg-slate-100 flex items-center justify-center border border-slate-200/50">
+                          <div className="absolute inset-0 flex">
+                            <img src={previewImage.url} className="w-1/2 h-full object-cover" alt="Video Left" />
+                            <div className="w-1/2 h-full overflow-hidden">
+                              <img src={previewImage.url} className="w-full h-full object-cover scale-150 origin-center opacity-90" alt="Video Right" />
+                            </div>
+                          </div>
+                          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                            <div className="bg-white/90 backdrop-blur w-7 h-7 rounded-full flex items-center justify-center text-[#1cb0b0] shadow-sm border border-slate-100">
+                              <ArrowRight size={14} weight="bold" />
+                            </div>
+                          </div>
+                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#fde047] shadow-sm flex items-center gap-1 backdrop-blur-sm">
+                            <Diamond size={10} weight="fill" className="text-[#ca8a04]" />
+                            4 credits
+                          </div>
+                        </div>
+                        <h3 className="font-bold text-slate-900 text-[15px] leading-snug mb-0.5">Create Video</h3>
+                        <p className="text-[11px] text-slate-500 leading-tight">Add natural motion to model image</p>
+                      </div>
                     </div>
-                  </div>
                   </div>
 
                   <div className="my-8 h-px bg-slate-200"></div>
@@ -933,6 +968,28 @@ export default function App() {
                       </div>
                     </div>
                   </div>
+
+                  <div className="my-8 h-px bg-slate-200"></div>
+                  
+                  <div className="mb-8">
+                    <h3 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-4">Actions</h3>
+                    <div className="bg-white border border-[#e2e8f0] shadow-sm rounded-xl p-2 flex flex-col">
+                      <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-3 rounded-md transition-colors">
+                        <DownloadSimple size={18} /> Download
+                      </button>
+                      <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-3 rounded-md transition-colors">
+                        <ShareNetwork size={18} /> Share
+                      </button>
+                      <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-3 rounded-md transition-colors">
+                        <FolderOpen size={18} /> Move to Folder
+                      </button>
+                      <div className="h-px bg-slate-100 my-1 mx-2"></div>
+                      <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-3 rounded-md transition-colors">
+                        <Trash size={18} /> Delete
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
               </motion.div>
             </motion.div>
