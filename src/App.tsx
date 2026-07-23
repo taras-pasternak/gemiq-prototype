@@ -7,7 +7,7 @@ import {
   MagnifyingGlass, House, Tray, Question, UploadSimple,
   FolderOpen, Eye, DownloadSimple, EnvelopeSimple, X,
   DotsThree, Plus, Diamond, ShareNetwork, ShoppingBag,
-  Scissors, BoundingBox, Ruler, TextT, ImageSquare, Broom, Eraser, CaretDown, Info, Crop, CaretLeft
+  Scissors, Ruler, TextT, ImageSquare, Broom, Info, Crop, CaretLeft
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
