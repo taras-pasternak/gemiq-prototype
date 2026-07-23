@@ -53,7 +53,7 @@ export default function App() {
   const [generatedResults, setGeneratedResults] = useState<any[]>([]);
   const [editingImageId, setEditingImageId] = useState<number | null>(null);
   const [editingName, setEditingName] = useState('');
-  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null);
 
   const selectedImages = images.filter(img => img.selected);
 
@@ -339,7 +339,7 @@ export default function App() {
                         <div className="px-6 py-3 bg-white text-xs font-medium text-slate-500 text-center">
                           {dateLabel.startsWith('Today') ? 'Today' : dateLabel.startsWith('Yesterday') ? 'Yesterday' : dateLabel}
                         </div>
-                        {groupImages.map((img, index) => (
+                        {groupImages.map((img) => (
                           <div key={img.id} className={`flex items-center gap-6 px-6 py-3 border-b border-slate-100 last:border-b-0 transition-all cursor-pointer ${img.selected ? 'bg-[#ecf7f8]' : 'bg-white hover:bg-slate-50'}`} onClick={() => toggleSelect(img.id)}>
                             <div className={`w-6 h-6 rounded border flex items-center justify-center shrink-0 ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0]' : 'bg-white border-slate-500'}`}>
                               {img.selected && <Check size={16} weight="bold" className="text-white" />}
