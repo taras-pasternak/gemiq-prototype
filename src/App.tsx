@@ -6,7 +6,8 @@ import {
   Trash, CircleNotch, ArrowLeft, PaintBrush,
   MagnifyingGlass, House, Tray, Question, UploadSimple,
   FolderOpen, Eye, DownloadSimple, EnvelopeSimple, X,
-  DotsThree, Plus, Diamond, ShareNetwork, ShoppingBag
+  DotsThree, Plus, Diamond, ShareNetwork, ShoppingBag,
+  Scissors, BoundingBox, Ruler, TextT, ImageSquare, Broom, Eraser, CaretDown, Info, Crop, CaretLeft
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
@@ -54,6 +55,30 @@ export default function App() {
   const [editingImageId, setEditingImageId] = useState<number | null>(null);
   const [editingName, setEditingName] = useState('');
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
+  const [previewImage, setPreviewImage] = useState<typeof MOCK_IMAGES[0] | null>(null);
+
+  const todaysImages = MOCK_IMAGES.filter(img => img.date.includes('Today'));
+  const isPreviewToday = previewImage ? todaysImages.some(img => img.id === previewImage.id) : false;
+
+  const handlePrevPreview = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!previewImage) return;
+    const currentIndex = todaysImages.findIndex(img => img.id === previewImage.id);
+    if (currentIndex !== -1) {
+      const prevIndex = currentIndex === 0 ? todaysImages.length - 1 : currentIndex - 1;
+      setPreviewImage(todaysImages[prevIndex]);
+    }
+  };
+
+  const handleNextPreview = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!previewImage) return;
+    const currentIndex = todaysImages.findIndex(img => img.id === previewImage.id);
+    if (currentIndex !== -1) {
+      const nextIndex = currentIndex === todaysImages.length - 1 ? 0 : currentIndex + 1;
+      setPreviewImage(todaysImages[nextIndex]);
+    }
+  };
 
   const selectedImages = images.filter(img => img.selected);
 
@@ -77,9 +102,12 @@ export default function App() {
 
   const selectedCount = images.filter(img => img.selected).length;
 
-  const ActionMenu = ({ className = "right-0 top-full mt-1" }: { className?: string }) => (
+  const ActionMenu = ({ className = "right-0 top-full mt-1", img }: { className?: string, img: typeof MOCK_IMAGES[0] }) => (
     <div className={`absolute ${className} w-64 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] border border-slate-100 py-1.5 z-[100] text-left font-sans text-slate-700 animate-in fade-in zoom-in-95 duration-100`} onClick={e => e.stopPropagation()}>
-      <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+      <button 
+        onClick={() => { setPreviewImage(img); setOpenMenuId(null); }}
+        className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors"
+      >
         <Eye size={16} className="text-slate-400" /> Preview (full screen)
       </button>
       <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
@@ -100,9 +128,21 @@ export default function App() {
 
       <button className="w-full text-left px-4 py-2 hover:bg-[#ecf7f8] flex flex-col gap-0.5 transition-colors group">
         <div className="flex items-center gap-3 text-sm font-medium text-[#1cb0b0]">
-          <Sparkle size={16} weight="fill" /> Edit with AI
+          <Sparkle size={16} weight="fill" /> Edit with AI (GemStudio)
         </div>
         <span className="text-[11px] text-slate-500 pl-7 leading-tight">Generate model & lifestyle image, change color</span>
+      </button>
+
+      <div className="h-px bg-slate-100 my-1.5"></div>
+
+      <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+        <ShareNetwork size={16} className="text-slate-400" /> Share
+      </button>
+      <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+        <DownloadSimple size={16} className="text-slate-400" /> Download
+      </button>
+      <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium text-red-500 transition-colors">
+        <Trash size={16} className="text-red-400" /> Delete
       </button>
     </div>
   );
@@ -267,21 +307,44 @@ export default function App() {
                         <h3 className="text-sm font-medium text-slate-500 mb-4">{dateLabel}</h3>
                         <div className="grid grid-cols-6 gap-x-3 gap-y-8">
                           {groupImages.map(img => (
-                            <div key={img.id} className="flex flex-col gap-1 group cursor-pointer" onClick={() => toggleSelect(img.id)}>
-                              <div className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 border border-slate-200 ${img.selected ? 'ring-2 ring-[#1cb0b0] ring-offset-2' : 'hover:border-slate-400'} ${originalSize ? 'bg-white' : ''}`}>
+                            <div key={img.id} className="relative flex flex-col gap-1 group cursor-pointer" onClick={() => toggleSelect(img.id)}>
+                              <div className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 border border-slate-200 group/imgcontainer ${img.selected ? 'ring-2 ring-[#1cb0b0] ring-offset-2' : 'hover:border-slate-400'} ${originalSize ? 'bg-white' : ''}`}>
                                 <img src={img.url} className={`w-full h-full ${originalSize ? 'object-contain' : 'object-cover'}`} alt="Ring" />
                                 
+                                {/* View Overlay */}
+                                <div 
+                                  onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    if (selectedCount > 0) {
+                                      toggleSelect(img.id);
+                                    } else {
+                                      setPreviewImage(img); 
+                                    }
+                                  }}
+                                  className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/imgcontainer:opacity-100 transition-all duration-200 flex items-end justify-center cursor-pointer pb-3"
+                                >
+                                  {selectedCount === 0 && (
+                                    <div className="flex items-center gap-2 text-white transform translate-y-2 group-hover/imgcontainer:translate-y-0 transition-transform duration-300">
+                                      <Eye size={18} weight="regular" />
+                                      <span className="font-medium text-[13px] tracking-wide">View</span>
+                                    </div>
+                                  )}
+                                </div>
+                                
                                 {/* Checkbox */}
-                                <div className={`absolute top-2 left-2 w-6 h-6 rounded border flex items-center justify-center transition-opacity ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0] opacity-100' : 'bg-white border-slate-500 opacity-0 group-hover:opacity-100'}`}>
+                                <div 
+                                  onClick={(e) => { e.stopPropagation(); toggleSelect(img.id); }}
+                                  className={`absolute top-2 left-2 w-6 h-6 rounded border flex items-center justify-center transition-opacity cursor-pointer z-10 ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0] opacity-100' : 'bg-white border-slate-500 opacity-0 group-hover:opacity-100'}`}
+                                >
                                   {img.selected && <Check size={16} weight="bold" className="text-white" />}
                                 </div>
                                 <div className={`absolute top-2 right-2 transition-opacity z-10 ${openMenuId === img.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
                                   <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === img.id ? null : img.id); }} className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition shadow-sm">
                                     <DotsThree size={20} weight="bold" />
                                   </button>
-                                  {openMenuId === img.id && <ActionMenu className="left-full top-0 ml-2" />}
                                 </div>
                               </div>
+                              {openMenuId === img.id && <ActionMenu img={img} className="left-3/4 top-8 ml-2" />}
                               <div className="text-left group/name h-7 flex items-center justify-start">
                                 {editingImageId === img.id ? (
                                   <input 
@@ -322,7 +385,7 @@ export default function App() {
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden">
+                  <div className="flex flex-col bg-white rounded-lg border border-slate-200">
                     {/* Table Header */}
                     <div className="flex items-center gap-6 px-6 py-3 bg-slate-100 border-b border-slate-200 text-xs font-semibold text-slate-500">
                       <div className="w-6 shrink-0"></div>
@@ -345,7 +408,22 @@ export default function App() {
                               {img.selected && <Check size={16} weight="bold" className="text-white" />}
                             </div>
                             
-                            <img src={img.url} className="w-16 h-16 rounded object-cover border border-slate-100 shrink-0" alt="Ring" />
+                            <div className="relative group/imgcontainer w-16 h-16 shrink-0 rounded overflow-hidden border border-slate-100">
+                              <img src={img.url} className="w-full h-full object-cover" alt="Ring" />
+                              <div 
+                                onClick={(e) => { 
+                                  e.stopPropagation(); 
+                                  if (selectedCount > 0) {
+                                    toggleSelect(img.id);
+                                  } else {
+                                    setPreviewImage(img); 
+                                  }
+                                }}
+                                className="absolute inset-0 bg-black/40 opacity-0 group-hover/imgcontainer:opacity-100 transition-opacity duration-200 flex items-center justify-center cursor-pointer"
+                              >
+                                {selectedCount === 0 && <Eye size={20} weight="regular" className="text-white" />}
+                              </div>
+                            </div>
                             
                             <div className="flex-1 flex items-center">
                               {editingImageId === img.id ? (
@@ -388,7 +466,7 @@ export default function App() {
                               <button className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition" onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === img.id ? null : img.id); }}>
                                 <DotsThree size={20} weight="bold" />
                               </button>
-                              {openMenuId === img.id && <ActionMenu />}
+                              {openMenuId === img.id && <ActionMenu img={img} />}
                             </div>
                           </div>
                         ))}
@@ -691,6 +769,172 @@ export default function App() {
               <button onClick={() => setImages(images.map(img => ({ ...img, selected: false })))} className="ml-2 p-1.5 hover:bg-slate-800 rounded-full transition">
                 <X size={16} className="text-slate-400" />
               </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Fullscreen Preview Modal */}
+        <AnimatePresence>
+          {previewImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[200] flex bg-slate-900/60 backdrop-blur-sm"
+              onClick={() => setPreviewImage(null)}
+            >
+              {/* Left Side: Image Preview */}
+              <div className="flex-1 flex flex-col relative p-6 h-full">
+                <button 
+                  className="absolute top-6 left-6 text-white/70 hover:text-white p-2.5 bg-black/20 hover:bg-black/40 rounded-full transition z-10 backdrop-blur-md"
+                  onClick={() => setPreviewImage(null)}
+                >
+                  <X size={20} weight="bold" />
+                </button>
+                <div className="flex-1 flex items-center justify-center p-8 min-h-0">
+                  <motion.img 
+                    initial={{ scale: 0.95, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.95, opacity: 0 }}
+                    key={previewImage.url} // Re-animate on source change
+                    src={previewImage.url} 
+                    className="max-w-full max-h-full w-auto h-auto object-contain shadow-2xl drop-shadow-[0_0_40px_rgba(0,0,0,0.25)] cursor-default" 
+                    onClick={e => e.stopPropagation()}
+                  />
+                </div>
+                
+                {isPreviewToday && (
+                  <div className="h-24 shrink-0 flex items-center justify-center gap-4 mt-4" onClick={e => e.stopPropagation()}>
+                    <button onClick={handlePrevPreview} className="text-white/60 hover:text-white p-2 hover:bg-white/10 rounded-full transition-colors">
+                      <CaretLeft size={24} weight="bold" />
+                    </button>
+                    
+                    <div className="flex items-center gap-3 px-4">
+                      {todaysImages.map(img => (
+                        <button 
+                          key={img.id}
+                          onClick={() => setPreviewImage(img)} 
+                          className={`w-[60px] h-[60px] rounded-lg overflow-hidden border-2 transition-all duration-200 ${previewImage.id === img.id ? 'border-white scale-110 shadow-lg' : 'border-transparent opacity-50 hover:opacity-100 hover:scale-105'}`}
+                        >
+                          <img src={img.url} className="w-full h-full object-cover" alt="Thumbnail" />
+                        </button>
+                      ))}
+                    </div>
+                    
+                    <button onClick={handleNextPreview} className="text-white/60 hover:text-white p-2 hover:bg-white/10 rounded-full transition-colors">
+                      <CaretRight size={24} weight="bold" />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Side: GemStudio Sidebar */}
+              <motion.div 
+                initial={{ x: '100%' }}
+                animate={{ x: 0 }}
+                exit={{ x: '100%' }}
+                transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                className="w-[440px] bg-white h-full shadow-[-10px_0_40px_rgba(0,0,0,0.15)] flex flex-col z-10"
+                onClick={e => e.stopPropagation()}
+              >
+                <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
+                  <h2 className="text-lg font-bold text-[#1e293b] truncate" title="Ring_Final_Render.png">Ring_Final_Render.png</h2>
+                  <button className="text-slate-400 hover:text-[#1cb0b0] transition shrink-0 ml-4" title={`Dimensions: 1024x1024\nDate: ${previewImage.date || 'Today'}`}>
+                    <Info size={22} />
+                  </button>
+                </div>
+                
+                <div className="p-6 flex-1 overflow-y-auto bg-white">
+                  <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider">Edit with AI (GemStudio)</h3>
+                      <div className="flex items-center gap-2 text-sm">
+                        <div className="bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-semibold text-xs border border-yellow-200">
+                          <Diamond size={14} weight="fill" className="text-yellow-600" />
+                          22 <span className="font-medium opacity-80">credits</span>
+                        </div>
+                        <button className="text-[#1cb0b0] font-semibold hover:underline text-xs">Recharge</button>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-2">
+                    {/* Model Image Card */}
+                    <div className="border border-[#e2e8f0] bg-[#f8fafc] hover:bg-[#f1f5f9] hover:border-[#cbd5e1] rounded-2xl p-3 flex flex-col items-center text-center cursor-pointer transition-all shadow-sm hover:shadow">
+                      <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden shadow-sm mb-3">
+                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=300&q=80" className="w-full h-full object-cover" alt="Model" />
+                      </div>
+                      <h3 className="font-semibold text-slate-900 text-[13px] leading-snug mb-1">Model Image</h3>
+                      <p className="text-[11px] text-slate-500 leading-tight">Create hyper-realistic model image</p>
+                    </div>
+
+                    {/* Change Gold Color Card */}
+                    <div className="border border-[#e2e8f0] bg-[#fdf8f6] hover:bg-[#faeee7] hover:border-[#f97316]/30 rounded-2xl p-3 flex flex-col items-center text-center cursor-pointer transition-all shadow-sm hover:shadow">
+                      <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-white shadow-sm flex items-center justify-center p-1.5 border border-slate-100 mb-3">
+                        <img src={MOCK_IMAGES[0].url} className="w-full h-full object-contain" alt="Gold Color" />
+                      </div>
+                      <h3 className="font-semibold text-slate-900 text-[13px] leading-snug mb-1">Gold Color</h3>
+                      <p className="text-[11px] text-slate-500 leading-tight">Change gold color to silver, yellow, or rose</p>
+                    </div>
+
+                    {/* Lifestyle Image Card */}
+                    <div className="border border-[#fecdd3]/40 bg-[#fff1f2]/50 hover:bg-[#fff1f2] hover:border-[#fecdd3] rounded-2xl p-3 flex flex-col items-center text-center cursor-pointer transition-all shadow-sm hover:shadow">
+                      <div className="w-20 h-20 shrink-0 rounded-xl overflow-hidden shadow-sm mb-3">
+                        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=300&q=80" className="w-full h-full object-cover" alt="Lifestyle" />
+                      </div>
+                      <h3 className="font-semibold text-slate-900 text-[13px] leading-snug mb-1">Lifestyle</h3>
+                      <p className="text-[11px] text-slate-500 leading-tight">Place jewelry in natural environments</p>
+                    </div>
+                  </div>
+                  </div>
+
+                  <div className="my-8 h-px bg-slate-200"></div>
+                  
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-4 mt-2">
+                      <h3 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider">Media Editor</h3>
+                      <button className="text-[#1cb0b0] font-semibold hover:underline text-xs">
+                        Open in Editor
+                      </button>
+                    </div>
+                    
+                    <div className="bg-white border border-[#e2e8f0] shadow-sm rounded-xl p-3 flex items-center justify-between">
+                      {/* Block 1: Remove BG */}
+                      <div className="flex flex-col items-center flex-1 cursor-pointer group">
+                        <Scissors size={22} className="text-slate-500 mb-1.5 group-hover:text-[#1cb0b0] transition-colors" />
+                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Remove BG</span>
+                      </div>
+                      
+                      <div className="w-px h-10 bg-slate-200 mx-1"></div>
+                      
+                      {/* Block 2: Measure */}
+                      <div className="flex flex-col items-center flex-1 cursor-pointer group">
+                        <Ruler size={22} className="text-slate-500 mb-1.5 group-hover:text-[#1cb0b0] transition-colors" />
+                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Measure</span>
+                      </div>
+                      
+                      <div className="w-px h-10 bg-slate-200 mx-1"></div>
+                      
+                      {/* Block 3: Crop */}
+                      <div className="flex flex-col items-center flex-1 cursor-pointer group">
+                        <Crop size={22} className="text-slate-500 mb-1.5 group-hover:text-[#1cb0b0] transition-colors" />
+                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Crop</span>
+                      </div>
+                      
+                      <div className="w-px h-10 bg-slate-200 mx-1"></div>
+                      
+                      {/* Block 4: Other tools */}
+                      <div className="flex flex-col items-center flex-1 cursor-pointer group">
+                        <div className="flex items-center gap-1 mb-1.5 text-slate-500 group-hover:text-[#1cb0b0] transition-colors">
+                          <TextT size={16} />
+                          <ImageSquare size={16} />
+                          <Broom size={16} />
+                        </div>
+                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Other tools</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
