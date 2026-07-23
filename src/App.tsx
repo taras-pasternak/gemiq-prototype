@@ -4,9 +4,9 @@ import {
   Folder, Image as ImageIcon, Sparkle, CheckCircle, 
   Download, CaretRight, GridFour, List, 
   Trash, CircleNotch, ArrowLeft, PaintBrush,
-  MagnifyingGlass, SquaresFour, House, Tray, Question, UploadSimple,
-  FolderOpen, Eye, DownloadSimple, EnvelopeSimple, SidebarSimple, X,
-  DotsThree, Plus
+  MagnifyingGlass, House, Tray, Question, UploadSimple,
+  FolderOpen, Eye, DownloadSimple, EnvelopeSimple, X,
+  DotsThree, Plus, Diamond
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
@@ -119,17 +119,16 @@ export default function App() {
             <NavItem icon={<GridFour size={18} />} label="Integrations" />
             <NavItem icon={<Question size={18} />} label="Tutorials" />
           </div>
-          <div className="mt-auto px-4 pb-4">
-            <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-lg p-3 flex items-center justify-between text-white shadow-sm border border-slate-700 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-16 h-16 bg-white opacity-5 blur-xl rounded-full -mr-8 -mt-8 pointer-events-none"></div>
-              <div className="flex items-center gap-2 relative z-10">
-                <Sparkle size={16} className="text-[#1cb0b0]" weight="fill" />
-                <span className="text-xs font-medium">Available credits</span>
+          <div className="mt-auto">
+            <div className="bg-[#fffbeb] border-t border-slate-200 px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-[#ffedd5] transition">
+              <div className="flex items-center gap-3">
+                <Diamond size={20} weight="bold" className="text-slate-700" />
+                <span className="text-[15px] font-medium text-slate-900">Available Credits: <span className="font-bold text-[#ff6b00]">35</span></span>
               </div>
-              <span className="text-xs font-bold text-slate-900 bg-[#1cb0b0] px-2 py-0.5 rounded-md relative z-10">35</span>
+              <CaretRight size={16} className="text-slate-400" />
             </div>
           </div>
-          <div className="border-t border-slate-100 flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-slate-50 transition">
+          <div className="border-t border-slate-200 flex items-center gap-3 px-6 py-4 cursor-pointer hover:bg-slate-50 transition">
             <div className="w-8 h-8 bg-slate-200 rounded-full flex items-center justify-center text-slate-600 font-bold text-sm shrink-0">WM</div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-slate-900 truncate">WeMakeMVP</p>
