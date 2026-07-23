@@ -6,7 +6,7 @@ import {
   Trash, CircleNotch, ArrowLeft, PaintBrush,
   MagnifyingGlass, House, Tray, Question, UploadSimple,
   FolderOpen, Eye, DownloadSimple, EnvelopeSimple, X,
-  DotsThree, Plus, Diamond, ShareNetwork
+  DotsThree, Plus, Diamond, ShareNetwork, ShoppingBag
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
@@ -52,7 +52,8 @@ export default function App() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedResults, setGeneratedResults] = useState<any[]>([]);
   const [editingImageId, setEditingImageId] = useState<number | null>(null);
-  const [editingName, setEditingName] = useState("");
+  const [editingName, setEditingName] = useState('');
+  const [openMenuId, setOpenMenuId] = useState<string | null>(null);
 
   const selectedImages = images.filter(img => img.selected);
 
@@ -76,8 +77,38 @@ export default function App() {
 
   const selectedCount = images.filter(img => img.selected).length;
 
+  const ActionMenu = ({ className = "right-0 top-full mt-1" }: { className?: string }) => (
+    <div className={`absolute ${className} w-64 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] border border-slate-100 py-1.5 z-[100] text-left font-sans text-slate-700 animate-in fade-in zoom-in-95 duration-100`} onClick={e => e.stopPropagation()}>
+      <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+        <Eye size={16} className="text-slate-400" /> Preview (full screen)
+      </button>
+      <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+        <ShoppingBag size={16} className="text-slate-400" /> Create product
+      </button>
+      <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+        <Plus size={16} className="text-slate-400" /> Add product details
+      </button>
+      
+      <div className="h-px bg-slate-100 my-1.5"></div>
+      
+      <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex flex-col gap-0.5 transition-colors">
+        <div className="flex items-center gap-3 text-sm font-medium">
+          <PaintBrush size={16} className="text-slate-400" /> Edit
+        </div>
+        <span className="text-[11px] text-slate-400 pl-7 leading-tight">Crop, resize, measure, add text, logo, adjust, erase...</span>
+      </button>
+
+      <button className="w-full text-left px-4 py-2 hover:bg-[#ecf7f8] flex flex-col gap-0.5 transition-colors group">
+        <div className="flex items-center gap-3 text-sm font-medium text-[#1cb0b0]">
+          <Sparkle size={16} weight="fill" /> Edit with AI
+        </div>
+        <span className="text-[11px] text-slate-500 pl-7 leading-tight">Generate model & lifestyle image, change color</span>
+      </button>
+    </div>
+  );
+
   return (
-    <div className="flex h-screen bg-white font-sans text-slate-800">
+    <div className="flex h-screen bg-white font-sans text-slate-800" onClick={() => setOpenMenuId(null)}>
       {/* Sidebar - Matching the screenshot */}
       <div className="w-64 bg-white border-r border-slate-200 flex flex-col justify-between">
         <div>
@@ -244,6 +275,12 @@ export default function App() {
                                 <div className={`absolute top-2 left-2 w-6 h-6 rounded border flex items-center justify-center transition-opacity ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0] opacity-100' : 'bg-white border-slate-500 opacity-0 group-hover:opacity-100'}`}>
                                   {img.selected && <Check size={16} weight="bold" className="text-white" />}
                                 </div>
+                                <div className={`absolute top-2 right-2 transition-opacity z-10 ${openMenuId === img.id ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                                  <button onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === img.id ? null : img.id); }} className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition shadow-sm">
+                                    <DotsThree size={20} weight="bold" />
+                                  </button>
+                                  {openMenuId === img.id && <ActionMenu className="left-full top-0 ml-2" />}
+                                </div>
                               </div>
                               <div className="text-left group/name h-7 flex items-center justify-start">
                                 {editingImageId === img.id ? (
@@ -347,10 +384,11 @@ export default function App() {
                             <div className="w-32 shrink-0 text-sm text-slate-500">{img.date?.startsWith('Today') ? 'Today' : img.date?.startsWith('Yesterday') ? 'Yesterday' : img.date}</div>
                             <div className="w-32 shrink-0 text-sm text-slate-500">{img.date?.startsWith('Today') ? 'Today' : img.date?.startsWith('Yesterday') ? 'Yesterday' : img.date}</div>
 
-                            <div className="w-8 shrink-0 flex justify-end">
-                              <button className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-200 transition" onClick={(e) => e.stopPropagation()}>
+                            <div className="w-8 shrink-0 flex justify-end relative z-10">
+                              <button className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition" onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === img.id ? null : img.id); }}>
                                 <DotsThree size={20} weight="bold" />
                               </button>
+                              {openMenuId === img.id && <ActionMenu />}
                             </div>
                           </div>
                         ))}
