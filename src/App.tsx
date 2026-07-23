@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Folder, Image as ImageIcon, Sparkle, CheckCircle, 
+  Folder, Image as ImageIcon, Sparkle, CheckCircle, Check,
   Download, CaretRight, GridFour, List, 
   Trash, CircleNotch, ArrowLeft, PaintBrush,
   MagnifyingGlass, House, Tray, Question, UploadSimple,
   FolderOpen, Eye, DownloadSimple, EnvelopeSimple, X,
-  DotsThree, Plus, Diamond
+  DotsThree, Plus, Diamond, ShareNetwork
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
@@ -39,7 +39,15 @@ export default function App() {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [originalSize, setOriginalSize] = useState(false);
   const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
+
   const [images, setImages] = useState(MOCK_IMAGES);
+
+  const groupedImages = images.reduce((acc, img) => {
+    const dateLabel = img.date || 'Unknown Date';
+    if (!acc[dateLabel]) acc[dateLabel] = [];
+    acc[dateLabel].push(img);
+    return acc;
+  }, {} as Record<string, typeof images>);
   const [selectedPreset, setSelectedPreset] = useState('luxury');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedResults, setGeneratedResults] = useState<any[]>([]);
@@ -65,6 +73,8 @@ export default function App() {
       setView('results');
     }, 3500);
   };
+
+  const selectedCount = images.filter(img => img.selected).length;
 
   return (
     <div className="flex h-screen bg-white font-sans text-slate-800">
@@ -223,16 +233,16 @@ export default function App() {
                   <div className="flex flex-col gap-8">
                     {Object.entries(groupedImages).map(([dateLabel, groupImages]) => (
                       <div key={dateLabel}>
-                        <h3 className="text-sm font-semibold text-slate-900 mb-4">{dateLabel}</h3>
-                        <div className="grid grid-cols-6 gap-x-6 gap-y-8">
+                        <h3 className="text-sm font-medium text-slate-500 mb-4">{dateLabel}</h3>
+                        <div className="grid grid-cols-6 gap-x-3 gap-y-8">
                           {groupImages.map(img => (
                             <div key={img.id} className="flex flex-col gap-1 group cursor-pointer" onClick={() => toggleSelect(img.id)}>
-                              <div className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 border border-slate-200 ${img.selected ? 'ring-2 ring-[#1cb0b0] ring-offset-2' : 'hover:border-slate-400'} ${originalSize ? 'bg-slate-50' : ''}`}>
+                              <div className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 border border-slate-200 ${img.selected ? 'ring-2 ring-[#1cb0b0] ring-offset-2' : 'hover:border-slate-400'} ${originalSize ? 'bg-white' : ''}`}>
                                 <img src={img.url} className={`w-full h-full ${originalSize ? 'object-contain' : 'object-cover'}`} alt="Ring" />
                                 
                                 {/* Checkbox */}
-                                <div className={`absolute top-2 left-2 w-5 h-5 rounded border flex items-center justify-center transition-opacity ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0] opacity-100' : 'bg-white/80 border-slate-300 opacity-0 group-hover:opacity-100'}`}>
-                                  {img.selected && <CheckCircle size={14} className="text-white" />}
+                                <div className={`absolute top-2 left-2 w-6 h-6 rounded border flex items-center justify-center transition-opacity ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0] opacity-100' : 'bg-white border-slate-500 opacity-0 group-hover:opacity-100'}`}>
+                                  {img.selected && <Check size={16} weight="bold" className="text-white" />}
                                 </div>
                               </div>
                               <div className="text-left group/name h-7 flex items-center justify-start">
@@ -277,9 +287,9 @@ export default function App() {
                 ) : (
                   <div className="flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden">
                     {/* Table Header */}
-                    <div className="flex items-center gap-6 px-6 py-4 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
-                      <div className="w-5 shrink-0"></div>
-                      <div className="w-12 shrink-0">Img</div>
+                    <div className="flex items-center gap-6 px-6 py-3 bg-slate-100 border-b border-slate-200 text-xs font-semibold text-slate-500">
+                      <div className="w-6 shrink-0"></div>
+                      <div className="w-16 shrink-0">Img</div>
                       <div className="flex-1">Name</div>
                       <div className="w-32 shrink-0">Date Uploaded</div>
                       <div className="w-32 shrink-0">Date Changed</div>
@@ -289,16 +299,16 @@ export default function App() {
                     {/* Table Body */}
                     {Object.entries(groupedImages).map(([dateLabel, groupImages]) => (
                       <React.Fragment key={dateLabel}>
-                        <div className="px-6 py-2 bg-slate-100 border-t border-b border-slate-200 text-xs font-semibold text-slate-700">
-                          {dateLabel}
+                        <div className="px-6 py-3 bg-white text-xs font-medium text-slate-500 text-center">
+                          {dateLabel.startsWith('Today') ? 'Today' : dateLabel.startsWith('Yesterday') ? 'Yesterday' : dateLabel}
                         </div>
-                        {groupImages.map(img => (
-                          <div key={img.id} className={`flex items-center gap-6 p-6 border-b border-slate-100 last:border-b-0 transition-all cursor-pointer ${img.selected ? 'bg-[#ecf7f8]' : 'bg-white hover:bg-slate-50'}`} onClick={() => toggleSelect(img.id)}>
-                            <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0]' : 'bg-white border-slate-300'}`}>
-                              {img.selected && <CheckCircle size={14} className="text-white" />}
+                        {groupImages.map((img, index) => (
+                          <div key={img.id} className={`flex items-center gap-6 px-6 py-3 border-b border-slate-100 last:border-b-0 transition-all cursor-pointer ${img.selected ? 'bg-[#ecf7f8]' : 'bg-white hover:bg-slate-50'}`} onClick={() => toggleSelect(img.id)}>
+                            <div className={`w-6 h-6 rounded border flex items-center justify-center shrink-0 ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0]' : 'bg-white border-slate-500'}`}>
+                              {img.selected && <Check size={16} weight="bold" className="text-white" />}
                             </div>
                             
-                            <img src={img.url} className="w-12 h-12 rounded object-cover border border-slate-100 shrink-0" alt="Ring" />
+                            <img src={img.url} className="w-16 h-16 rounded object-cover border border-slate-100 shrink-0" alt="Ring" />
                             
                             <div className="flex-1 flex items-center">
                               {editingImageId === img.id ? (
@@ -334,8 +344,8 @@ export default function App() {
                               )}
                             </div>
 
-                            <div className="w-32 shrink-0 text-sm text-slate-500">{img.date}</div>
-                            <div className="w-32 shrink-0 text-sm text-slate-500">{img.date}</div>
+                            <div className="w-32 shrink-0 text-sm text-slate-500">{img.date?.startsWith('Today') ? 'Today' : img.date?.startsWith('Yesterday') ? 'Yesterday' : img.date}</div>
+                            <div className="w-32 shrink-0 text-sm text-slate-500">{img.date?.startsWith('Today') ? 'Today' : img.date?.startsWith('Yesterday') ? 'Yesterday' : img.date}</div>
 
                             <div className="w-8 shrink-0 flex justify-end">
                               <button className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-200 transition" onClick={(e) => e.stopPropagation()}>
@@ -351,32 +361,7 @@ export default function App() {
               </div>
 
               {/* BULK ACTION BAR */}
-              <AnimatePresence>
-                {selectedImages.length > 0 && (
-                  <motion.div 
-                    initial={{ y: 100, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: 100, opacity: 0 }}
-                    className="absolute bottom-16 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-6 z-50 border border-slate-700"
-                  >
-                    <span className="font-medium bg-slate-800 px-3 py-1.5 rounded-md text-sm border border-slate-700">{selectedImages.length} selected</span>
-                    <div className="w-px h-6 bg-slate-700"></div>
-                    <button className="flex items-center gap-2 text-slate-300 hover:text-white transition text-sm font-medium">
-                      <Folder size={18} /> Add to Folder
-                    </button>
-                    <button 
-                      onClick={() => setView('studio')}
-                      className="flex items-center gap-2 bg-[#1cb0b0] hover:bg-[#159a9a] text-white px-5 py-2.5 rounded-lg transition font-bold shadow-lg"
-                    >
-                      <Sparkle size={18} /> Open in GemStudio
-                    </button>
-                    <div className="w-px h-6 bg-slate-700"></div>
-                    <button className="text-slate-400 hover:text-red-400 transition" title="Delete">
-                      <Trash size={18} />
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+
                 </div> {/* End Center Content Column */}
 
                 {/* Right Sidebar */}
@@ -634,6 +619,42 @@ export default function App() {
             </motion.div>
           )}
 
+        </AnimatePresence>
+
+        {/* Floating Action Bar */}
+        <AnimatePresence>
+          {selectedCount > 0 && view === 'media' && (
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-8 z-50 pointer-events-auto"
+            >
+              <div className="flex items-center gap-3 border-r border-slate-700 pr-8">
+                <span className="text-sm font-medium text-slate-400">{selectedCount} selected</span>
+              </div>
+              
+              <button className="flex items-center gap-2 text-sm font-medium hover:text-[#1cb0b0] transition whitespace-nowrap">
+                <Sparkle size={18} /> Create a product
+              </button>
+              <button className="flex items-center gap-2 text-sm font-medium hover:text-[#1cb0b0] transition whitespace-nowrap">
+                <Folder size={18} /> Move to folder
+              </button>
+              <button className="flex items-center gap-2 text-sm font-medium hover:text-[#1cb0b0] transition whitespace-nowrap">
+                <ShareNetwork size={18} /> Share
+              </button>
+              <button className="flex items-center gap-2 text-sm font-medium hover:text-[#1cb0b0] transition whitespace-nowrap">
+                <DownloadSimple size={18} /> Download
+              </button>
+              <button className="flex items-center gap-2 text-sm font-medium text-red-400 hover:text-red-300 transition whitespace-nowrap">
+                <Trash size={18} /> Delete
+              </button>
+              
+              <button onClick={() => setImages(images.map(img => ({ ...img, selected: false })))} className="ml-2 p-1.5 hover:bg-slate-800 rounded-full transition">
+                <X size={16} className="text-slate-400" />
+              </button>
+            </motion.div>
+          )}
         </AnimatePresence>
       </div>
     </div>
