@@ -4,7 +4,9 @@ import {
   Folder, Image as ImageIcon, Sparkle, CheckCircle, 
   Download, CaretRight, GridFour, List, 
   Trash, CircleNotch, ArrowLeft, PaintBrush,
-  MagnifyingGlass, SquaresFour, House, Tray, Question, UploadSimple
+  MagnifyingGlass, SquaresFour, House, Tray, Question, UploadSimple,
+  FolderOpen, Eye, DownloadSimple, EnvelopeSimple, SidebarSimple, X,
+  DotsThree, Plus
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
@@ -18,6 +20,12 @@ const MOCK_IMAGES = [
   { id: 8, url: '/img3.jpg', selected: false, name: 'Vintage Brooch.jpg' },
 ];
 
+const MOCK_FOLDERS = [
+  { id: 1, name: 'Fall Collection 2026', items: 24, date: 'Oct 12', previews: ['/img1.jpg', '/img2.jpg', '/img3.jpg', '/img1.jpg'] },
+  { id: 2, name: 'Client Deliverables - ABC', items: 8, date: 'Oct 10', previews: ['/img2.jpg', '/img3.jpg', '/img1.jpg', '/img2.jpg'] },
+  { id: 3, name: 'Empty Project', items: 0, date: 'Oct 14', previews: [] }
+];
+
 const PRESETS = [
   { id: 'insta', name: 'Instagram Story (9:16)', icon: '📱', desc: 'Optimized for social media stories' },
   { id: 'square', name: 'Website Square (1:1)', icon: '⬜', desc: 'Clean white background for e-commerce' },
@@ -29,6 +37,7 @@ export default function App() {
   const [view, setView] = useState<'media' | 'studio' | 'results'>('media');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [originalSize, setOriginalSize] = useState(false);
+  const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
   const [images, setImages] = useState(MOCK_IMAGES);
   const [selectedPreset, setSelectedPreset] = useState('luxury');
   const [isGenerating, setIsGenerating] = useState(false);
@@ -145,7 +154,7 @@ export default function App() {
               className="flex-1 flex flex-col h-full"
             >
               {/* Header */}
-              <div className="p-6 bg-white border-b border-slate-200">
+              <div className="p-6 bg-white border-b border-slate-200 shrink-0">
                 <div className="flex justify-between items-start">
                   <div>
                     <h1 className="text-2xl font-bold text-slate-900">Product Media</h1>
@@ -159,10 +168,12 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Content Area */}
-              <div className="flex-1 overflow-auto p-6">
-                {/* Toolbar */}
-                <div className="flex justify-between items-center mb-6">
+              <div className="flex-1 flex overflow-hidden relative bg-slate-50">
+                {/* Center Content Column */}
+                <div className="flex-1 flex flex-col min-w-0 relative">
+                  <div className="flex-1 overflow-auto p-6">
+                    {/* Toolbar */}
+                    <div className="flex justify-between items-center mb-6 shrink-0">
                   <div className="relative w-[380px]">
                     <MagnifyingGlass size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input 
@@ -180,18 +191,29 @@ export default function App() {
                         <div className={`w-4 h-4 rounded-full bg-white absolute top-0.5 transition-transform duration-200 ease-in-out ${originalSize ? 'translate-x-4 left-[2px]' : 'translate-x-0 left-[2px]'}`}></div>
                       </button>
                     </div>
+                    
                     <div className="flex bg-slate-200/50 p-1 rounded-lg border border-slate-200">
                       <button 
                         onClick={() => setViewMode('grid')}
-                        className={`px-3 py-1.5 rounded-md transition-colors flex items-center justify-center gap-2 ${viewMode === 'grid' ? 'bg-white shadow-sm text-[#1cb0b0] font-medium' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'}`}
+                        className={`px-3 py-1.5 rounded-md flex items-center gap-2 text-sm font-medium transition ${viewMode === 'grid' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                       >
-                        <SquaresFour size={18} /> <span className="text-sm">Grid</span>
+                        <GridFour size={18} /> Grid
                       </button>
                       <button 
                         onClick={() => setViewMode('list')}
-                        className={`px-3 py-1.5 rounded-md transition-colors flex items-center justify-center gap-2 ${viewMode === 'list' ? 'bg-white shadow-sm text-[#1cb0b0] font-medium' : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200'}`}
+                        className={`px-3 py-1.5 rounded-md flex items-center gap-2 text-sm font-medium transition ${viewMode === 'list' ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                       >
-                        <List size={18} /> <span className="text-sm">List</span>
+                        <List size={18} /> List
+                      </button>
+                    </div>
+                    
+                    <div className="flex bg-slate-200/50 p-1 rounded-lg border border-slate-200">
+                      <button 
+                        onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}
+                        className={`px-3 py-1.5 rounded-md transition-colors flex items-center gap-2 text-sm font-medium ${isRightSidebarOpen ? 'text-[#1cb0b0]' : 'text-slate-500 hover:text-slate-700'}`}
+                        title="Toggle Folders Sidebar"
+                      >
+                        {isRightSidebarOpen ? <X size={18} /> : <Folder size={18} />} Folders
                       </button>
                     </div>
                   </div>
@@ -294,17 +316,6 @@ export default function App() {
                 )}
               </div>
 
-              {/* Pagination (Footer) */}
-              <div className="px-8 py-4 border-t border-slate-100 flex justify-between items-center text-sm text-slate-500">
-                <span>27 items total</span>
-                <div className="flex items-center gap-4">
-                  <button className="text-slate-400 hover:text-slate-700">&lt; Prev</button>
-                  <button className="w-8 h-8 flex items-center justify-center border border-slate-200 rounded text-slate-800 font-medium">1</button>
-                  <button className="text-slate-400 hover:text-slate-700">Next &gt;</button>
-                  <button className="text-[#1cb0b0] border-b border-transparent hover:border-[#1cb0b0]">50 per page</button>
-                </div>
-              </div>
-
               {/* BULK ACTION BAR */}
               <AnimatePresence>
                 {selectedImages.length > 0 && (
@@ -332,6 +343,79 @@ export default function App() {
                   </motion.div>
                 )}
               </AnimatePresence>
+                </div> {/* End Center Content Column */}
+
+                {/* Right Sidebar */}
+                <AnimatePresence>
+                  {isRightSidebarOpen && (
+                    <motion.div 
+                      initial={{ width: 0, opacity: 0 }}
+                      animate={{ width: 420, opacity: 1 }}
+                      exit={{ width: 0, opacity: 0 }}
+                      className="bg-white border-l border-slate-200 flex flex-col h-full shrink-0 overflow-hidden"
+                    >
+                    <div className="h-[42px] my-6 px-6 flex justify-between items-center shrink-0 w-full">
+                      <h2 className="text-sm font-medium text-slate-500">Folders</h2>
+                      <button className="w-8 h-8 rounded-full bg-[#e0f1f2] flex items-center justify-center text-[#1cb0b0] hover:bg-[#cde9ea] transition" title="Add Folder">
+                        <Plus size={16} weight="bold" />
+                      </button>
+                    </div>
+                    
+                    <div className="flex-1 overflow-y-auto flex flex-col">
+                      {MOCK_FOLDERS.map(folder => (
+                        <div key={folder.id} className="border-b border-slate-100 first:border-t last:border-b-0 p-6 hover:bg-slate-50 transition group cursor-pointer relative flex items-center justify-between">
+                          <div className="flex items-center gap-4 flex-1 min-w-0">
+                            <div className="w-12 h-12 rounded-lg bg-[#e0f1f2] flex items-center justify-center shrink-0 overflow-hidden border border-slate-100">
+                              {folder.items > 0 ? (
+                                <div className="grid grid-cols-2 grid-rows-2 gap-[1px] w-full h-full bg-slate-200">
+                                  {folder.previews.map((src, i) => (
+                                    <img key={i} src={src} className="w-full h-full object-cover" alt="preview" />
+                                  ))}
+                                </div>
+                              ) : (
+                                <FolderOpen size={24} className="text-[#1cb0b0]" weight="fill" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="text-sm font-semibold text-slate-900 truncate">{folder.name}</h3>
+                              <p className="text-xs text-slate-500 mt-1">{folder.items} items • {folder.date}</p>
+                            </div>
+                          </div>
+                          
+                          <div className="relative group/menu ml-4">
+                            <button className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition">
+                              <DotsThree size={20} weight="bold" />
+                            </button>
+                            
+                            <div className="absolute right-0 top-full mt-1 w-56 bg-white border border-slate-200 rounded-lg shadow-xl py-1 opacity-0 invisible group-hover/menu:opacity-100 group-hover/menu:visible transition-all z-50 origin-top-right">
+                              <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 hover:text-[#1cb0b0] flex items-center gap-3 transition">
+                                <Eye size={16} /> Quick Preview
+                              </button>
+                              <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 hover:text-[#1cb0b0] flex items-center gap-3 transition">
+                                <FolderOpen size={16} /> Open
+                              </button>
+                              <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 hover:text-[#1cb0b0] flex items-center gap-3 transition">
+                                <DownloadSimple size={16} /> Download as Archive
+                              </button>
+                              <button className="w-full px-4 py-2 text-left text-sm text-slate-700 hover:bg-slate-50 hover:text-[#1cb0b0] flex items-center gap-3 transition">
+                                <EnvelopeSimple size={16} /> Send Archive via Email
+                              </button>
+                              
+                              <div className="my-1 border-t border-slate-100"></div>
+                              
+                              <button className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 hover:text-red-700 flex items-center gap-3 transition">
+                                <Trash size={16} /> Delete Folder
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+              </div>
+
             </motion.div>
           )}
 
