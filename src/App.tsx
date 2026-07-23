@@ -12,10 +12,19 @@ import {
 
 const MOCK_IMAGES = [
   { id: 1, url: '/img1.jpg', selected: false, name: 'Emerald Halo Ring.png', date: 'Today, 23 Jul 2026' },
-  { id: 2, url: '/img2.jpg', selected: false, name: '+ Add Name', date: 'Today, 23 Jul 2026' },
+  { id: 2, url: '/img2.jpg', selected: false, name: 'Untitled', date: 'Today, 23 Jul 2026' },
+  { id: 9, url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', selected: false, name: 'Silver Chain.jpg', date: 'Today, 23 Jul 2026' },
+  { id: 10, url: 'https://images.unsplash.com/photo-1585960622850-ed33c41d6418?w=800&q=80', selected: false, name: 'Gold Ring.jpg', date: 'Today, 23 Jul 2026' },
+  { id: 11, url: 'https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=800&q=80', selected: false, name: 'Diamond Earring.jpg', date: 'Today, 23 Jul 2026' },
+  { id: 12, url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80', selected: false, name: 'Ruby Pendant.jpg', date: 'Today, 23 Jul 2026' },
+  { id: 13, url: 'https://images.unsplash.com/photo-1590166223826-12dee1677420?w=800&q=80', selected: false, name: 'Sapphire Bracelet.jpg', date: 'Today, 23 Jul 2026' },
+  { id: 14, url: 'https://images.unsplash.com/photo-1599458349289-18f0ee82e6ed?w=800&q=80', selected: false, name: 'Pearl Necklace.jpg', date: 'Today, 23 Jul 2026' },
+  { id: 15, url: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80', selected: false, name: 'Platinum Band.jpg', date: 'Today, 23 Jul 2026' },
+  { id: 16, url: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80', selected: false, name: 'Opal Brooch.jpg', date: 'Today, 23 Jul 2026' },
+  { id: 17, url: 'https://images.unsplash.com/photo-1622398925373-3f91b1e275f5?w=800&q=80', selected: false, name: 'Amethyst Ring.jpg', date: 'Today, 23 Jul 2026' },
   { id: 3, url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', selected: false, name: 'Diamond Solitaire.jpg', date: 'Yesterday, 22 Jul 2026' },
   { id: 4, url: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80', selected: false, name: 'Sapphire Pendant.png', date: 'Yesterday, 22 Jul 2026' },
-  { id: 5, url: '/img3.jpg', selected: false, name: '+ Add Name', date: 'Yesterday, 22 Jul 2026' },
+  { id: 5, url: '/img3.jpg', selected: false, name: 'Untitled', date: 'Yesterday, 22 Jul 2026' },
   { id: 6, url: '/img1.jpg', selected: false, name: 'Gold Wedding Band.jpg', date: 'Jul 20, 2026' },
   { id: 7, url: '/img2.jpg', selected: false, name: 'Rose Gold Band.png', date: 'Jul 20, 2026' },
   { id: 8, url: '/img3.jpg', selected: false, name: 'Vintage Brooch.jpg', date: 'Jul 20, 2026' },
@@ -161,8 +170,8 @@ export default function App() {
           </div>
 
           <div className="px-4 mb-6 pt-6">
-            <button className="w-full h-[80px] bg-[#ecf7f8] border border-[#23a9b9] overflow-hidden relative rounded-md flex group hover:bg-[#e0f1f2] transition-colors text-left">
-              <div className="absolute h-[77px] w-[89px] left-2 top-0 pointer-events-none flex items-center justify-center">
+            <button className="w-full h-[80px] bg-[#ecf7f8] border-2 border-transparent hover:border-[#23a9b9] overflow-hidden relative rounded-md flex group hover:bg-[#e0f1f2] transition-all duration-200 text-left">
+              <div className="absolute top-0 bottom-0 w-[89px] left-2 pointer-events-none flex items-end justify-center">
                 <img alt="GemCam" className="w-[85px] object-contain drop-shadow-sm" src="/gemcam-icon.png.png" />
               </div>
               <div className="flex-1 flex items-center justify-end pr-0 pl-[95px]">
@@ -204,8 +213,8 @@ export default function App() {
           <div className="mt-auto">
             <div className="bg-[#fffbeb] border-t border-slate-200 px-6 py-4 flex items-center justify-between cursor-pointer hover:bg-[#ffedd5] transition">
               <div className="flex items-center gap-3">
-                <Diamond size={20} weight="bold" className="text-slate-700" />
-                <span className="text-[15px] font-medium text-slate-900">Available Credits: <span className="font-bold text-[#ff6b00]">35</span></span>
+                <Diamond size={18} weight="bold" className="text-slate-400" />
+                <span className="text-sm font-medium text-slate-600">Available Credits: <span className="font-bold text-[#ff6b00]">35</span></span>
               </div>
               <CaretRight size={16} className="text-slate-400" />
             </div>
@@ -308,7 +317,7 @@ export default function App() {
                         <div className="grid grid-cols-6 gap-x-3 gap-y-8">
                           {groupImages.map(img => (
                             <div key={img.id} className="relative flex flex-col gap-1 group cursor-pointer" onClick={() => toggleSelect(img.id)}>
-                              <div className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 border border-slate-200 group/imgcontainer ${img.selected ? 'ring-2 ring-[#1cb0b0] ring-offset-2' : 'hover:border-slate-400'} ${originalSize ? 'bg-white' : ''}`}>
+                              <div className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 border-2 border-transparent group/imgcontainer ${img.selected ? 'ring-2 ring-[#1cb0b0] ring-offset-2' : 'hover:border-[#1cb0b0]'} ${originalSize ? 'bg-white' : ''}`}>
                                 <img src={img.url} className={`w-full h-full ${originalSize ? 'object-contain' : 'object-cover'}`} alt="Ring" />
                                 
                                 {/* View Overlay */}
@@ -353,12 +362,12 @@ export default function App() {
                                     value={editingName}
                                     onChange={(e) => setEditingName(e.target.value)}
                                     onBlur={() => {
-                                      setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
+                                      setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || 'Untitled' } : i));
                                       setEditingImageId(null);
                                     }}
                                     onKeyDown={(e) => {
                                       if (e.key === 'Enter') {
-                                        setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
+                                        setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || 'Untitled' } : i));
                                         setEditingImageId(null);
                                       }
                                     }}
@@ -371,7 +380,7 @@ export default function App() {
                                     onClick={(e) => {
                                       e.stopPropagation();
                                       setEditingImageId(img.id);
-                                      setEditingName(img.name === '+ Add Name' ? '' : img.name);
+                                      setEditingName(img.name === 'Untitled' ? '' : img.name);
                                     }}
                                   >
                                     {img.name}
@@ -433,12 +442,12 @@ export default function App() {
                                   value={editingName}
                                   onChange={(e) => setEditingName(e.target.value)}
                                   onBlur={() => {
-                                    setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
+                                    setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || 'Untitled' } : i));
                                     setEditingImageId(null);
                                   }}
                                   onKeyDown={(e) => {
                                     if (e.key === 'Enter') {
-                                      setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
+                                      setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || 'Untitled' } : i));
                                       setEditingImageId(null);
                                     }
                                   }}
@@ -451,7 +460,7 @@ export default function App() {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setEditingImageId(img.id);
-                                    setEditingName(img.name === '+ Add Name' ? '' : img.name);
+                                    setEditingName(img.name === 'Untitled' ? '' : img.name);
                                   }}
                                 >
                                   {img.name}
@@ -780,7 +789,7 @@ export default function App() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[200] flex bg-slate-900/60 backdrop-blur-sm"
+              className="fixed inset-0 z-[200] flex bg-black/80 backdrop-blur-sm"
               onClick={() => setPreviewImage(null)}
             >
               {/* Left Side: Image Preview */}
@@ -798,7 +807,7 @@ export default function App() {
                     exit={{ scale: 0.95, opacity: 0 }}
                     key={previewImage.url} // Re-animate on source change
                     src={previewImage.url} 
-                    className="max-w-full max-h-full w-auto h-auto object-contain shadow-2xl drop-shadow-[0_0_40px_rgba(0,0,0,0.25)] cursor-default" 
+                    className="max-w-full max-h-full w-auto h-auto object-contain cursor-default" 
                     onClick={e => e.stopPropagation()}
                   />
                 </div>
@@ -839,31 +848,42 @@ export default function App() {
               >
                 <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
                   <h2 className="text-lg font-bold text-[#1e293b] truncate" title="Ring_Final_Render.png">Ring_Final_Render.png</h2>
-                  <button className="text-slate-400 hover:text-[#1cb0b0] transition shrink-0 ml-4" title={`Dimensions: 1024x1024\nDate: ${previewImage.date || 'Today'}`}>
+                  <button className="text-slate-400 hover:text-[#1cb0b0] transition shrink-0 ml-4 relative group">
                     <Info size={22} />
+                    <div className="absolute right-0 top-full mt-2.5 w-[220px] bg-slate-900 text-white text-xs rounded-lg shadow-xl p-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none text-left z-50 flex flex-col gap-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400">Dimensions:</span>
+                        <span className="font-medium">1024 x 1024</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400">Size:</span>
+                        <span className="font-medium">4.2 MB</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400">Uploaded:</span>
+                        <span className="font-medium">{previewImage.date || 'Today'}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-slate-400">AI Generated:</span>
+                        <span className="font-medium text-[#1cb0b0]">Today, 14:30</span>
+                      </div>
+                    </div>
                   </button>
                 </div>
                 
                 <div className="p-6 flex-1 overflow-y-auto bg-white">
                   <div className="mb-8">
-                    <div className="flex items-center justify-between mb-4">
+                    <div className="mb-4">
                       <h3 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider">Edit with AI (GemStudio)</h3>
-                      <div className="flex items-center gap-2 text-sm">
-                        <div className="bg-yellow-100 text-yellow-800 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-semibold text-xs border border-yellow-200">
-                          <Diamond size={14} weight="fill" className="text-yellow-600" />
-                          22 <span className="font-medium opacity-80">Available credits</span>
-                        </div>
-                        <button className="text-[#1cb0b0] font-semibold hover:underline text-xs">Recharge</button>
-                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-3">
                       {/* Model Image Card */}
-                      <div className="border border-[#e2e8f0] bg-[#f8fafc] hover:bg-[#f1f5f9] hover:border-[#cbd5e1] rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
+                      <div className="border border-[#e2e8f0] bg-[#f8fafc] hover:bg-[#f1f5f9] hover:border-transparent hover:ring-2 hover:ring-blue-400 rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
                         <div className="relative w-full aspect-[4/3] shrink-0 rounded-md overflow-hidden mb-2.5">
                           <img src="/img2.jpg" className="w-full h-full object-cover" alt="Model" />
-                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#fde047] shadow-sm flex items-center gap-1 backdrop-blur-sm">
-                            <Diamond size={10} weight="fill" className="text-[#ca8a04]" />
+                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-xs font-medium flex items-center gap-1 backdrop-blur-sm">
+                            <Diamond size={12} weight="fill" className="text-[#ca8a04]" />
                             1 credit
                           </div>
                         </div>
@@ -872,11 +892,11 @@ export default function App() {
                       </div>
 
                       {/* Change Color Card */}
-                      <div className="border border-[#e2e8f0] bg-[#fdf8f6] hover:bg-[#faeee7] hover:border-[#f97316]/30 rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
+                      <div className="border border-[#e2e8f0] bg-[#fdf8f6] hover:bg-[#faeee7] hover:border-transparent hover:ring-2 hover:ring-orange-400 rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
                         <div className="relative w-full aspect-[4/3] shrink-0 rounded-md overflow-hidden bg-white flex items-center justify-center p-1.5 border border-slate-100 mb-2.5">
                           <img src="/img1.jpg" className="w-full h-full object-contain" alt="Change Color" />
-                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#fde047] shadow-sm flex items-center gap-1 backdrop-blur-sm">
-                            <Diamond size={10} weight="fill" className="text-[#ca8a04]" />
+                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-xs font-medium flex items-center gap-1 backdrop-blur-sm">
+                            <Diamond size={12} weight="fill" className="text-[#ca8a04]" />
                             1 credit
                           </div>
                         </div>
@@ -885,11 +905,11 @@ export default function App() {
                       </div>
 
                       {/* Lifestyle Image Card */}
-                      <div className="border border-[#fecdd3]/40 bg-[#fff1f2]/50 hover:bg-[#fff1f2] hover:border-[#fecdd3] rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
+                      <div className="border border-[#fecdd3]/40 bg-[#fff1f2]/50 hover:bg-[#fff1f2] hover:border-transparent hover:ring-2 hover:ring-rose-400 rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
                         <div className="relative w-full aspect-[4/3] shrink-0 rounded-md overflow-hidden mb-2.5">
                           <img src="/img3.jpg" className="w-full h-full object-cover" alt="Lifestyle" />
-                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#fde047] shadow-sm flex items-center gap-1 backdrop-blur-sm">
-                            <Diamond size={10} weight="fill" className="text-[#ca8a04]" />
+                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-xs font-medium flex items-center gap-1 backdrop-blur-sm">
+                            <Diamond size={12} weight="fill" className="text-[#ca8a04]" />
                             1 credit
                           </div>
                         </div>
@@ -898,7 +918,7 @@ export default function App() {
                       </div>
 
                       {/* Model Video Card */}
-                      <div className="border border-[#e2e8f0] bg-[#f0f9ff] hover:bg-[#e0f2fe] hover:border-[#bae6fd] rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
+                      <div className="border border-[#e2e8f0] bg-[#f0f9ff] hover:bg-[#e0f2fe] hover:border-transparent hover:ring-2 hover:ring-sky-400 rounded-lg p-2.5 flex flex-col items-center text-center cursor-pointer transition-all">
                         <div className="relative w-full aspect-[4/3] shrink-0 rounded-md overflow-hidden mb-2.5 bg-slate-100 flex items-center justify-center border border-slate-200/50">
                           <div className="absolute inset-0 flex">
                             <img src={previewImage.url} className="w-1/2 h-full object-cover" alt="Video Left" />
@@ -911,8 +931,8 @@ export default function App() {
                               <ArrowRight size={14} weight="bold" />
                             </div>
                           </div>
-                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-[10px] font-bold border border-[#fde047] shadow-sm flex items-center gap-1 backdrop-blur-sm">
-                            <Diamond size={10} weight="fill" className="text-[#ca8a04]" />
+                          <div className="absolute bottom-1.5 left-1.5 bg-[#fef9c3]/95 text-[#854d0e] px-1.5 py-0.5 rounded text-xs font-medium flex items-center gap-1 backdrop-blur-sm">
+                            <Diamond size={12} weight="fill" className="text-[#ca8a04]" />
                             4 credits
                           </div>
                         </div>
@@ -920,11 +940,21 @@ export default function App() {
                         <p className="text-[11px] text-slate-500 leading-tight">Add natural motion to model image</p>
                       </div>
                     </div>
+                    
+                    <div className="mt-4 bg-yellow-50 border border-yellow-200 rounded-xl p-3 flex items-center justify-between w-full">
+                      <div className="flex items-center gap-2.5 text-yellow-800">
+                        <div className="bg-yellow-100 p-1.5 rounded-full">
+                          <Diamond size={18} weight="fill" className="text-yellow-600" />
+                        </div>
+                        <span className="font-bold text-sm">22 Available credits</span>
+                      </div>
+                      <button className="bg-[#1cb0b0] hover:bg-[#189a9a] text-white font-bold text-xs px-4 py-2 rounded-lg transition-colors">
+                        Edit with AI in GemStudio
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="my-8 h-px bg-slate-200"></div>
-                  
-                  <div className="mb-4">
+                  <div className="mb-4 mt-8">
                     <div className="flex items-center justify-between mb-4 mt-2">
                       <h3 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider">Media Editor</h3>
                       <button className="text-[#1cb0b0] font-semibold hover:underline text-xs">
@@ -932,14 +962,12 @@ export default function App() {
                       </button>
                     </div>
                     
-                    <div className="bg-white border border-[#e2e8f0] shadow-sm rounded-xl p-3 flex items-center justify-between">
+                    <div className="bg-white border border-[#e2e8f0] rounded-lg p-3 flex items-center justify-between">
                       {/* Block 1: Remove BG */}
                       <div className="flex flex-col items-center flex-1 cursor-pointer group">
                         <Scissors size={22} className="text-slate-500 mb-1.5 group-hover:text-[#1cb0b0] transition-colors" />
                         <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Remove BG</span>
                       </div>
-                      
-                      <div className="w-px h-10 bg-slate-200 mx-1"></div>
                       
                       {/* Block 2: Measure */}
                       <div className="flex flex-col items-center flex-1 cursor-pointer group">
@@ -947,33 +975,33 @@ export default function App() {
                         <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Measure</span>
                       </div>
                       
-                      <div className="w-px h-10 bg-slate-200 mx-1"></div>
-                      
                       {/* Block 3: Crop */}
                       <div className="flex flex-col items-center flex-1 cursor-pointer group">
                         <Crop size={22} className="text-slate-500 mb-1.5 group-hover:text-[#1cb0b0] transition-colors" />
-                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Crop</span>
+                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Crop & resize</span>
                       </div>
-                      
-                      <div className="w-px h-10 bg-slate-200 mx-1"></div>
                       
                       {/* Block 4: Other tools */}
                       <div className="flex flex-col items-center flex-1 cursor-pointer group">
                         <div className="flex items-center gap-1 mb-1.5 text-slate-500 group-hover:text-[#1cb0b0] transition-colors">
-                          <TextT size={16} />
-                          <ImageSquare size={16} />
-                          <Broom size={16} />
+                          <TextT size={22} />
+                          <ImageSquare size={22} />
+                          <Broom size={22} />
                         </div>
-                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Other tools</span>
+                        <span className="text-[12px] font-semibold text-slate-600 group-hover:text-slate-900 transition-colors text-center whitespace-nowrap">Other tools...</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="my-8 h-px bg-slate-200"></div>
-                  
-                  <div className="mb-8">
+                  <div className="mb-8 mt-8">
                     <h3 className="text-[13px] font-bold text-slate-500 uppercase tracking-wider mb-4">Actions</h3>
-                    <div className="bg-white border border-[#e2e8f0] shadow-sm rounded-xl p-2 flex flex-col">
+                    <div className="flex flex-col">
+                      <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-3 rounded-md transition-colors">
+                        <ShoppingBag size={18} /> Create product
+                      </button>
+                      <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-3 rounded-md transition-colors">
+                        <List size={18} /> Add product details
+                      </button>
                       <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-3 rounded-md transition-colors">
                         <DownloadSimple size={18} /> Download
                       </button>
@@ -983,7 +1011,6 @@ export default function App() {
                       <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-3 rounded-md transition-colors">
                         <FolderOpen size={18} /> Move to Folder
                       </button>
-                      <div className="h-px bg-slate-100 my-1 mx-2"></div>
                       <button className="w-full px-4 py-2.5 text-left text-sm font-medium text-red-600 hover:bg-red-50 flex items-center gap-3 rounded-md transition-colors">
                         <Trash size={18} /> Delete
                       </button>
