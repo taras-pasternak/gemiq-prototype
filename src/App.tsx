@@ -10,14 +10,14 @@ import {
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
-  { id: 1, url: '/img1.jpg', selected: false, name: 'Emerald Halo Ring.png' },
-  { id: 2, url: '/img2.jpg', selected: false, name: '+ Add Name' },
-  { id: 3, url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', selected: false, name: 'Diamond Solitaire.jpg' },
-  { id: 4, url: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80', selected: false, name: 'Sapphire Pendant.png' },
-  { id: 5, url: '/img3.jpg', selected: false, name: '+ Add Name' },
-  { id: 6, url: '/img1.jpg', selected: false, name: 'Gold Wedding Band.jpg' },
-  { id: 7, url: '/img2.jpg', selected: false, name: 'Rose Gold Band.png' },
-  { id: 8, url: '/img3.jpg', selected: false, name: 'Vintage Brooch.jpg' },
+  { id: 1, url: '/img1.jpg', selected: false, name: 'Emerald Halo Ring.png', date: 'Today, 23 Jul 2026' },
+  { id: 2, url: '/img2.jpg', selected: false, name: '+ Add Name', date: 'Today, 23 Jul 2026' },
+  { id: 3, url: 'https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?w=800&q=80', selected: false, name: 'Diamond Solitaire.jpg', date: 'Yesterday, 22 Jul 2026' },
+  { id: 4, url: 'https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80', selected: false, name: 'Sapphire Pendant.png', date: 'Yesterday, 22 Jul 2026' },
+  { id: 5, url: '/img3.jpg', selected: false, name: '+ Add Name', date: 'Yesterday, 22 Jul 2026' },
+  { id: 6, url: '/img1.jpg', selected: false, name: 'Gold Wedding Band.jpg', date: 'Jul 20, 2026' },
+  { id: 7, url: '/img2.jpg', selected: false, name: 'Rose Gold Band.png', date: 'Jul 20, 2026' },
+  { id: 8, url: '/img3.jpg', selected: false, name: 'Vintage Brooch.jpg', date: 'Jul 20, 2026' },
 ];
 
 const MOCK_FOLDERS = [
@@ -32,6 +32,7 @@ const PRESETS = [
   { id: 'luxury', name: 'Luxury Dark Theme', icon: '✨', desc: 'Dramatic lighting on dark marble' },
   { id: 'model', name: 'On Model (Lifestyle)', icon: '👩', desc: 'AI generated hand wearing the ring' }
 ];
+
 
 export default function App() {
   const [view, setView] = useState<'media' | 'studio' | 'results'>('media');
@@ -219,97 +220,131 @@ export default function App() {
                 </div>
                 
                 {viewMode === 'grid' ? (
-                  <div className="grid grid-cols-6 gap-x-6 gap-y-8">
-                    {images.map(img => (
-                      <div key={img.id} className="flex flex-col gap-1 group cursor-pointer" onClick={() => toggleSelect(img.id)}>
-                        <div className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 border border-slate-200 ${img.selected ? 'ring-2 ring-[#1cb0b0] ring-offset-2' : 'hover:border-slate-400'} ${originalSize ? 'bg-slate-50' : ''}`}>
-                          <img src={img.url} className={`w-full h-full ${originalSize ? 'object-contain' : 'object-cover'}`} alt="Ring" />
-                          
-                          {/* Checkbox */}
-                          <div className={`absolute top-2 left-2 w-5 h-5 rounded border flex items-center justify-center transition-opacity ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0] opacity-100' : 'bg-white/80 border-slate-300 opacity-0 group-hover:opacity-100'}`}>
-                            {img.selected && <CheckCircle size={14} className="text-white" />}
-                          </div>
-                        </div>
-                        <div className="text-left group/name h-7 flex items-center justify-start">
-                          {editingImageId === img.id ? (
-                            <input 
-                              autoFocus
-                              type="text"
-                              value={editingName}
-                              onChange={(e) => setEditingName(e.target.value)}
-                              onBlur={() => {
-                                setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
-                                setEditingImageId(null);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
-                                  setEditingImageId(null);
-                                }
-                              }}
-                              className="text-sm font-medium text-left border-b-2 border-[#1cb0b0] focus:outline-none w-[90%] bg-transparent"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          ) : (
-                            <span 
-                              className={`text-sm font-medium px-2 py-1 -ml-2 rounded border border-transparent cursor-text transition-all ${img.name.includes('+') ? 'text-[#1cb0b0]' : 'text-slate-800'} hover:border-slate-300 hover:bg-slate-50`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingImageId(img.id);
-                                setEditingName(img.name === '+ Add Name' ? '' : img.name);
-                              }}
-                            >
-                              {img.name}
-                            </span>
-                          )}
+                  <div className="flex flex-col gap-8">
+                    {Object.entries(groupedImages).map(([dateLabel, groupImages]) => (
+                      <div key={dateLabel}>
+                        <h3 className="text-sm font-semibold text-slate-900 mb-4">{dateLabel}</h3>
+                        <div className="grid grid-cols-6 gap-x-6 gap-y-8">
+                          {groupImages.map(img => (
+                            <div key={img.id} className="flex flex-col gap-1 group cursor-pointer" onClick={() => toggleSelect(img.id)}>
+                              <div className={`relative aspect-square rounded-lg overflow-hidden transition-all duration-200 border border-slate-200 ${img.selected ? 'ring-2 ring-[#1cb0b0] ring-offset-2' : 'hover:border-slate-400'} ${originalSize ? 'bg-slate-50' : ''}`}>
+                                <img src={img.url} className={`w-full h-full ${originalSize ? 'object-contain' : 'object-cover'}`} alt="Ring" />
+                                
+                                {/* Checkbox */}
+                                <div className={`absolute top-2 left-2 w-5 h-5 rounded border flex items-center justify-center transition-opacity ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0] opacity-100' : 'bg-white/80 border-slate-300 opacity-0 group-hover:opacity-100'}`}>
+                                  {img.selected && <CheckCircle size={14} className="text-white" />}
+                                </div>
+                              </div>
+                              <div className="text-left group/name h-7 flex items-center justify-start">
+                                {editingImageId === img.id ? (
+                                  <input 
+                                    autoFocus
+                                    type="text"
+                                    value={editingName}
+                                    onChange={(e) => setEditingName(e.target.value)}
+                                    onBlur={() => {
+                                      setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
+                                      setEditingImageId(null);
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === 'Enter') {
+                                        setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
+                                        setEditingImageId(null);
+                                      }
+                                    }}
+                                    className="text-sm font-medium text-left border-b-2 border-[#1cb0b0] focus:outline-none w-[90%] bg-transparent"
+                                    onClick={(e) => e.stopPropagation()}
+                                  />
+                                ) : (
+                                  <span 
+                                    className={`text-sm font-medium px-2 py-1 -ml-2 rounded border border-transparent cursor-text transition-all ${img.name.includes('+') ? 'text-[#1cb0b0]' : 'text-slate-800'} hover:border-slate-300 hover:bg-slate-50`}
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setEditingImageId(img.id);
+                                      setEditingName(img.name === '+ Add Name' ? '' : img.name);
+                                    }}
+                                  >
+                                    {img.name}
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="flex flex-col gap-2">
-                    {images.map(img => (
-                      <div key={img.id} className={`flex items-center gap-4 p-3 rounded-lg border transition-all cursor-pointer ${img.selected ? 'bg-[#ecf7f8] border-[#1cb0b0]' : 'bg-white border-slate-200 hover:border-slate-300'}`} onClick={() => toggleSelect(img.id)}>
-                        <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0]' : 'bg-white border-slate-300'}`}>
-                          {img.selected && <CheckCircle size={14} className="text-white" />}
+                  <div className="flex flex-col bg-white rounded-lg border border-slate-200 overflow-hidden">
+                    {/* Table Header */}
+                    <div className="flex items-center gap-6 px-6 py-4 bg-slate-50 text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                      <div className="w-5 shrink-0"></div>
+                      <div className="w-12 shrink-0">Img</div>
+                      <div className="flex-1">Name</div>
+                      <div className="w-32 shrink-0">Date Uploaded</div>
+                      <div className="w-32 shrink-0">Date Changed</div>
+                      <div className="w-8 shrink-0"></div>
+                    </div>
+
+                    {/* Table Body */}
+                    {Object.entries(groupedImages).map(([dateLabel, groupImages]) => (
+                      <React.Fragment key={dateLabel}>
+                        <div className="px-6 py-2 bg-slate-100 border-t border-b border-slate-200 text-xs font-semibold text-slate-700">
+                          {dateLabel}
                         </div>
-                        
-                        <img src={img.url} className="w-12 h-12 rounded object-cover border border-slate-100 shrink-0" alt="Ring" />
-                        
-                        <div className="flex-1 flex items-center">
-                          {editingImageId === img.id ? (
-                            <input 
-                              autoFocus
-                              type="text"
-                              value={editingName}
-                              onChange={(e) => setEditingName(e.target.value)}
-                              onBlur={() => {
-                                setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
-                                setEditingImageId(null);
-                              }}
-                              onKeyDown={(e) => {
-                                if (e.key === 'Enter') {
-                                  setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
-                                  setEditingImageId(null);
-                                }
-                              }}
-                              className="text-sm font-medium text-left border-b-2 border-[#1cb0b0] focus:outline-none min-w-[200px] bg-transparent"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                          ) : (
-                            <span 
-                              className={`text-sm font-medium px-2 py-1 -ml-2 rounded border border-transparent cursor-text transition-all ${img.name.includes('+') ? 'text-[#1cb0b0]' : 'text-slate-800'} hover:border-slate-300 hover:bg-slate-50`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setEditingImageId(img.id);
-                                setEditingName(img.name === '+ Add Name' ? '' : img.name);
-                              }}
-                            >
-                              {img.name}
-                            </span>
-                          )}
-                        </div>
-                      </div>
+                        {groupImages.map(img => (
+                          <div key={img.id} className={`flex items-center gap-6 p-6 border-b border-slate-100 last:border-b-0 transition-all cursor-pointer ${img.selected ? 'bg-[#ecf7f8]' : 'bg-white hover:bg-slate-50'}`} onClick={() => toggleSelect(img.id)}>
+                            <div className={`w-5 h-5 rounded border flex items-center justify-center shrink-0 ${img.selected ? 'bg-[#1cb0b0] border-[#1cb0b0]' : 'bg-white border-slate-300'}`}>
+                              {img.selected && <CheckCircle size={14} className="text-white" />}
+                            </div>
+                            
+                            <img src={img.url} className="w-12 h-12 rounded object-cover border border-slate-100 shrink-0" alt="Ring" />
+                            
+                            <div className="flex-1 flex items-center">
+                              {editingImageId === img.id ? (
+                                <input 
+                                  autoFocus
+                                  type="text"
+                                  value={editingName}
+                                  onChange={(e) => setEditingName(e.target.value)}
+                                  onBlur={() => {
+                                    setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
+                                    setEditingImageId(null);
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === 'Enter') {
+                                      setImages(images.map(i => i.id === img.id ? { ...i, name: editingName || '+ Add Name' } : i));
+                                      setEditingImageId(null);
+                                    }
+                                  }}
+                                  className="text-sm font-medium text-left border-b-2 border-[#1cb0b0] focus:outline-none min-w-[200px] bg-transparent"
+                                  onClick={(e) => e.stopPropagation()}
+                                />
+                              ) : (
+                                <span 
+                                  className={`text-sm font-medium px-2 py-1 -ml-2 rounded border border-transparent cursor-text transition-all ${img.name.includes('+') ? 'text-[#1cb0b0]' : 'text-slate-800'} hover:border-slate-300 hover:bg-slate-50`}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setEditingImageId(img.id);
+                                    setEditingName(img.name === '+ Add Name' ? '' : img.name);
+                                  }}
+                                >
+                                  {img.name}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="w-32 shrink-0 text-sm text-slate-500">{img.date}</div>
+                            <div className="w-32 shrink-0 text-sm text-slate-500">{img.date}</div>
+
+                            <div className="w-8 shrink-0 flex justify-end">
+                              <button className="text-slate-400 hover:text-slate-600 p-1.5 rounded-full hover:bg-slate-200 transition" onClick={(e) => e.stopPropagation()}>
+                                <DotsThree size={20} weight="bold" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </React.Fragment>
                     ))}
                   </div>
                 )}
