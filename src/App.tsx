@@ -3,12 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Folder, Image as ImageIcon, Sparkle, CheckCircle, Check,
   Download, CaretRight, GridFour, List, 
-  Trash, CircleNotch, ArrowLeft, PaintBrush,
+  Trash, CircleNotch, ArrowLeft, MagicWand,
   MagnifyingGlass, House, Tray, Question, UploadSimple,
   FolderOpen, Eye, DownloadSimple, EnvelopeSimple, X,
   DotsThree, Plus, Diamond, ShareNetwork, ShoppingBag,
   Scissors, Ruler, TextT, ImageSquare, Broom, Info, Crop, CaretLeft, ArrowRight,
-  ChatCircle, Paperclip, PaperPlaneRight, CaretDown
+  ChatCircle, Paperclip, PaperPlaneRight, CaretDown, VideoCamera, Images
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
@@ -66,11 +66,14 @@ export default function App() {
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [previewImage, setPreviewImage] = useState<typeof MOCK_IMAGES[0] | null>(null);
   const [gemStudioImage, setGemStudioImage] = useState<typeof MOCK_IMAGES[0] | null>(null);
-  const [gemStudioStep, setGemStudioStep] = useState<'options' | 'model_preferences'>('options');
+  const [gemStudioStep, setGemStudioStep] = useState<'options' | 'model_preferences' | 'results'>('options');
   const [gemStudioImageStyle, setGemStudioImageStyle] = useState<{name: string, url: string} | null>(null);
   const [gemStudioCategory, setGemStudioCategory] = useState('Model Image');
   const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
   const [isStyleMenuOpen, setIsStyleMenuOpen] = useState(false);
+  const [isBottomCategoryMenuOpen, setIsBottomCategoryMenuOpen] = useState(false);
+  const [isBottomStyleMenuOpen, setIsBottomStyleMenuOpen] = useState(false);
+  const [openResultMenuId, setOpenResultMenuId] = useState<string | null>(null);
 
   const todaysImages = MOCK_IMAGES.filter(img => img.date.includes('Today'));
   const isPreviewToday = previewImage ? todaysImages.some(img => img.id === previewImage.id) : false;
@@ -106,16 +109,21 @@ export default function App() {
     setTimeout(() => {
       setIsGenerating(false);
       setGeneratedResults([
-        { id: 'g1', url: 'https://images.unsplash.com/photo-1599643471711-c752015822f7?w=800&q=80', selected: false, label: 'Variation 1' },
-        { id: 'g2', url: 'https://images.unsplash.com/photo-1599643471711-c752015822f7?w=800&q=80&sat=-100', selected: false, label: 'Variation 2' },
-        { id: 'g3', url: 'https://images.unsplash.com/photo-1605100804763-247f66150ce8?w=800&q=80', selected: false, label: 'Variation 3' },
-        { id: 'g4', url: 'https://images.unsplash.com/photo-1605100804763-247f66150ce8?w=800&q=80&sat=-100', selected: false, label: 'Variation 4' },
+        { id: 'g1', url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80', selected: false, label: 'Result 1' },
+        { id: 'g2', url: 'https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=800&q=80', selected: false, label: 'Result 2' },
+        { id: 'g3', url: 'https://images.unsplash.com/photo-1599458349289-18f0ee82e6ed?w=800&q=80', selected: false, label: 'Result 3' },
+        { id: 'g4', url: 'https://images.unsplash.com/photo-1622398925373-3f91b1e275f5?w=800&q=80', selected: false, label: 'Result 4' },
       ]);
-      setView('results');
-    }, 3500);
+      setGemStudioStep('results');
+    }, 2000);
+  };
+
+  const toggleGeneratedSelect = (id: string) => {
+    setGeneratedResults(results => results.map(r => r.id === id ? { ...r, selected: !r.selected } : r));
   };
 
   const selectedCount = images.filter(img => img.selected).length;
+  const selectedResultsCount = generatedResults.filter(r => r.selected).length;
 
   const ActionMenu = ({ className = "right-0 top-full mt-1", img }: { className?: string, img: typeof MOCK_IMAGES[0] }) => (
     <div className={`absolute ${className} w-64 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] border border-slate-100 py-1.5 z-[100] text-left font-sans text-slate-700 animate-in fade-in zoom-in-95 duration-100`} onClick={e => e.stopPropagation()}>
@@ -136,7 +144,7 @@ export default function App() {
       
       <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex flex-col gap-0.5 transition-colors">
         <div className="flex items-center gap-3 text-sm font-medium">
-          <PaintBrush size={16} className="text-slate-400" /> Edit
+          <MagicWand size={16} className="text-slate-400" /> Edit
         </div>
         <span className="text-[11px] text-slate-400 pl-7 leading-tight">Crop, resize, measure, add text, logo, adjust, erase...</span>
       </button>
@@ -145,8 +153,10 @@ export default function App() {
         className="w-full text-left px-4 py-2 hover:bg-[#ecf7f8] flex flex-col gap-0.5 transition-colors group"
         onClick={(e) => {
           e.stopPropagation();
-          setGemStudioImage(img);
+          setGemStudioImageStyle(null);
           setGemStudioStep('options');
+          setGeneratedResults([]);
+          setGemStudioImage(img);
           setOpenMenuId(null);
         }}
       >
@@ -367,7 +377,55 @@ export default function App() {
                                   </button>
                                 </div>
                               </div>
-                              {openMenuId === img.id && <ActionMenu img={img} className="left-3/4 top-8 ml-2" />}
+                              {openMenuId === img.id && (
+                                <div
+                                  className="absolute left-3/4 top-8 ml-2 w-64 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] border border-slate-100 py-1.5 z-[100] text-left font-sans text-slate-700"
+                                  onClick={e => e.stopPropagation()}
+                                >
+                                  <button onClick={(e) => { e.stopPropagation(); setPreviewImage(img); setOpenMenuId(null); }} className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <Eye size={16} className="text-slate-400" /> Preview (full screen)
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <ShoppingBag size={16} className="text-slate-400" /> Create product
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <Plus size={16} className="text-slate-400" /> Add product details
+                                  </button>
+                                  <div className="h-px bg-slate-100 my-1.5"></div>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex flex-col gap-0.5 transition-colors">
+                                    <div className="flex items-center gap-3 text-sm font-medium">
+                                      <MagicWand size={16} className="text-slate-400" /> Edit
+                                    </div>
+                                    <span className="text-[11px] text-slate-400 pl-7 leading-tight">Crop, resize, measure, add text, logo, adjust, erase...</span>
+                                  </button>
+                                  <button
+                                    className="w-full text-left px-4 py-2 hover:bg-[#ecf7f8] flex flex-col gap-0.5 transition-colors group"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setGemStudioImageStyle(null);
+                                      setGemStudioStep('options');
+                                      setGeneratedResults([]);
+                                      setGemStudioImage(img);
+                                      setOpenMenuId(null);
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3 text-sm font-medium text-[#1cb0b0]">
+                                      <Sparkle size={16} weight="fill" /> Edit with AI (GemStudio)
+                                    </div>
+                                    <span className="text-[11px] text-slate-500 pl-7 leading-tight">Generate model & lifestyle image, change color</span>
+                                  </button>
+                                  <div className="h-px bg-slate-100 my-1.5"></div>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <ShareNetwork size={16} className="text-slate-400" /> Share
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <DownloadSimple size={16} className="text-slate-400" /> Download
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium text-red-500 transition-colors">
+                                    <Trash size={16} className="text-red-400" /> Delete
+                                  </button>
+                                </div>
+                              )}
                               <div className="text-left group/name h-7 flex items-center justify-start">
                                 {editingImageId === img.id ? (
                                   <input 
@@ -489,7 +547,48 @@ export default function App() {
                               <button className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600 transition" onClick={(e) => { e.stopPropagation(); setOpenMenuId(openMenuId === img.id ? null : img.id); }}>
                                 <DotsThree size={20} weight="bold" />
                               </button>
-                              {openMenuId === img.id && <ActionMenu img={img} />}
+                              {openMenuId === img.id && (
+                                <div
+                                  className="absolute right-0 top-full mt-1 w-64 bg-white rounded-xl shadow-[0_4px_20px_-4px_rgba(0,0,0,0.15)] border border-slate-100 py-1.5 z-[200] text-left font-sans text-slate-700"
+                                  onClick={e => e.stopPropagation()}
+                                >
+                                  <button onClick={(e) => { e.stopPropagation(); setPreviewImage(img); setOpenMenuId(null); }} className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <Eye size={16} className="text-slate-400" /> Preview (full screen)
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <ShoppingBag size={16} className="text-slate-400" /> Create product
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <Plus size={16} className="text-slate-400" /> Add product details
+                                  </button>
+                                  <div className="h-px bg-slate-100 my-1.5"></div>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex flex-col gap-0.5 transition-colors">
+                                    <div className="flex items-center gap-3 text-sm font-medium">
+                                      <MagicWand size={16} className="text-slate-400" /> Edit
+                                    </div>
+                                    <span className="text-[11px] text-slate-400 pl-7 leading-tight">Crop, resize, measure, add text, logo, adjust, erase...</span>
+                                  </button>
+                                  <button
+                                    className="w-full text-left px-4 py-2 hover:bg-[#ecf7f8] flex flex-col gap-0.5 transition-colors"
+                                    onClick={(e) => { e.stopPropagation(); setGemStudioImageStyle(null); setGemStudioStep('options'); setGeneratedResults([]); setGemStudioImage(img); setOpenMenuId(null); }}
+                                  >
+                                    <div className="flex items-center gap-3 text-sm font-medium text-[#1cb0b0]">
+                                      <Sparkle size={16} weight="fill" /> Edit with AI (GemStudio)
+                                    </div>
+                                    <span className="text-[11px] text-slate-500 pl-7 leading-tight">Generate model & lifestyle image, change color</span>
+                                  </button>
+                                  <div className="h-px bg-slate-100 my-1.5"></div>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <ShareNetwork size={16} className="text-slate-400" /> Share
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium transition-colors">
+                                    <DownloadSimple size={16} className="text-slate-400" /> Download
+                                  </button>
+                                  <button className="w-full text-left px-4 py-2 hover:bg-slate-50 flex items-center gap-3 text-sm font-medium text-red-500 transition-colors">
+                                    <Trash size={16} className="text-red-400" /> Delete
+                                  </button>
+                                </div>
+                              )}
                             </div>
                           </div>
                         ))}
@@ -1091,7 +1190,7 @@ export default function App() {
 
 
             {/* Scrollable Center Content */}
-            <div className="flex-1 overflow-y-auto px-12 py-12 pb-40 flex justify-center">
+            <div className={`flex-1 overflow-y-auto px-12 pb-40 flex justify-center ${['options', 'model_preferences'].includes(gemStudioStep) ? 'py-12 items-center' : 'pt-6 items-start'}`}>
               {gemStudioStep === 'options' ? (
                 <div className="w-full max-w-[900px]">
                   <div className="grid grid-cols-2 gap-4">
@@ -1120,8 +1219,8 @@ export default function App() {
                       </div>
                       <div className="w-16 h-16 rounded-[14px] bg-slate-100 overflow-hidden shrink-0 relative flex items-center justify-center">
                         <div className="absolute inset-0 flex">
-                          <img src="https://images.unsplash.com/photo-1599643471711-c752015822f7?w=800&q=80" alt="Gold" className="w-1/2 h-full object-cover group-hover:scale-105 transition-transform duration-500 origin-left" />
-                          <img src="https://images.unsplash.com/photo-1599643471711-c752015822f7?w=800&q=80&sat=-100" alt="Silver" className="w-1/2 h-full object-cover group-hover:scale-105 transition-transform duration-500 origin-right" />
+                          <img src="https://images.unsplash.com/photo-1585960622850-ed33c41d6418?w=800&q=80" alt="Gold" className="w-1/2 h-full object-cover group-hover:scale-105 transition-transform duration-500 origin-left" />
+                          <img src="https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80" alt="Silver" className="w-1/2 h-full object-cover group-hover:scale-105 transition-transform duration-500 origin-right" />
                         </div>
                       </div>
                     </div>
@@ -1136,7 +1235,7 @@ export default function App() {
                         <p className="text-[14px] text-slate-500 leading-relaxed pr-2">Enhance realism by placing jewelry in natural lifestyle environments</p>
                       </div>
                       <div className="w-16 h-16 rounded-[14px] bg-slate-100 overflow-hidden shrink-0 relative">
-                        <img src="https://images.unsplash.com/photo-1605100804763-247f66150ce8?w=800&q=80" alt="Lifestyle" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <img src="https://images.unsplash.com/photo-1590166223826-12dee1677420?w=800&q=80" alt="Lifestyle" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       </div>
                     </div>
 
@@ -1160,151 +1259,251 @@ export default function App() {
                     </div>
                   </div>
                 </div>
-              ) : (
-                <div className="w-full max-w-[800px] mt-4">
-                  {/* Category Selector Card */}
-                  <div className="relative mb-4">
+              ) : gemStudioStep === 'model_preferences' ? (
+                <div className="w-full max-w-[800px]">
+
+
+                  <div className="flex items-center gap-2 mb-4">
                     <button 
-                      onClick={() => { setIsCategoryMenuOpen(!isCategoryMenuOpen); setIsStyleMenuOpen(false); }}
-                      className="w-full bg-white border border-slate-400/60 rounded-[20px] p-4 flex items-center justify-between hover:border-slate-400 hover:bg-slate-50 transition-all shadow-sm"
+                      onClick={() => setGemStudioStep('options')} 
+                      className="w-7 h-7 rounded-md text-slate-500 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center transition-colors -ml-2"
                     >
-                      <div className="flex items-center gap-5">
-                        <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden shrink-0 border border-slate-200">
-                          <img src={gemStudioImage?.url} alt="Original" className="w-full h-full object-cover" />
-                        </div>
-                        <span className="font-bold text-slate-900 text-[17px]">{gemStudioCategory}</span>
-                      </div>
-                      <CaretDown size={24} weight="bold" className={`text-slate-400 mr-2 transition-transform ${isCategoryMenuOpen ? 'rotate-180' : ''}`} />
+                      <ArrowLeft size={16} weight="bold" />
                     </button>
-                    
-                    <AnimatePresence>
-                      {isCategoryMenuOpen && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                          className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-[16px] shadow-lg z-50 overflow-hidden"
-                        >
-                          {['Model Image', 'Change Gold Color', 'Lifestyle Image', 'Create Video'].map(cat => (
+                    <h3 className="font-medium text-slate-700 text-[15px]">Select Model Image Style</h3>
+                  </div>
+                  <div className="grid grid-cols-3 gap-5 mb-8">
+                    {/* Option 1 */}
+                    <div 
+                      className="flex flex-col gap-3 cursor-pointer group"
+                      onClick={() => setGemStudioImageStyle({name: 'Standard Close-up', url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80'})}
+                    >
+                      <div className={`aspect-square rounded-[20px] overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all ${gemStudioImageStyle?.name === 'Standard Close-up' ? 'ring-4 ring-[#1cb0b0]' : 'border border-slate-200'}`}>
+                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80" alt="Standard Close-up" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                      <div className="text-center font-medium text-[15px] text-slate-600 group-hover:text-slate-900 transition-colors">Standard Close-up</div>
+                    </div>
+                    {/* Option 2 */}
+                    <div 
+                      className="flex flex-col gap-3 cursor-pointer group"
+                      onClick={() => setGemStudioImageStyle({name: 'Fashion Model', url: 'https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=800&q=80'})}
+                    >
+                      <div className={`aspect-square rounded-[20px] overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all ${gemStudioImageStyle?.name === 'Fashion Model' ? 'ring-4 ring-[#1cb0b0]' : 'border border-slate-200'}`}>
+                        <img src="https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=800&q=80" alt="Fashion Model" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                      <div className="text-center font-medium text-[15px] text-slate-600 group-hover:text-slate-900 transition-colors">Fashion Model</div>
+                    </div>
+                    {/* Option 3 */}
+                    <div 
+                      className="flex flex-col gap-3 cursor-pointer group"
+                      onClick={() => setGemStudioImageStyle({name: 'Casual Elegance', url: 'https://images.unsplash.com/photo-1599458349289-18f0ee82e6ed?w=800&q=80'})}
+                    >
+                      <div className={`aspect-square rounded-[20px] overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all ${gemStudioImageStyle?.name === 'Casual Elegance' ? 'ring-4 ring-[#1cb0b0]' : 'border border-slate-200'}`}>
+                        <img src="https://images.unsplash.com/photo-1599458349289-18f0ee82e6ed?w=800&q=80" alt="Casual Elegance" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                      <div className="text-center font-medium text-[15px] text-slate-600 group-hover:text-slate-900 transition-colors">Casual Elegance</div>
+                    </div>
+                  </div>
+                </div>
+              ) : gemStudioStep === 'results' ? (
+                <div className="w-full px-8 mt-4">
+                  <div className="grid grid-cols-4 gap-5 mb-8">
+                    {generatedResults.map(res => (
+                      <div key={res.id} className="relative flex flex-col gap-1 group cursor-pointer" onClick={() => toggleGeneratedSelect(res.id)}>
+                        <div className={`relative aspect-[9/16] rounded-[12px] overflow-hidden transition-all duration-200 group/imgcontainer ${res.selected ? 'ring-4 ring-[#1cb0b0]' : ''}`}>
+                          <img src={res.url} className="w-full h-full object-cover" alt={res.label} />
+                          
+                          {/* Checkbox */}
+                          <div 
+                            onClick={(e) => { e.stopPropagation(); toggleGeneratedSelect(res.id); }}
+                            className={`absolute top-3 left-3 w-6 h-6 rounded-[6px] border flex items-center justify-center transition-opacity cursor-pointer z-10 ${res.selected ? 'bg-[#1cb0b0] border-[#1cb0b0] opacity-100' : 'bg-white/90 backdrop-blur-sm border-slate-300 opacity-0 group-hover:opacity-100 shadow-sm'}`}
+                          >
+                            {res.selected && <Check size={16} weight="bold" className="text-white" />}
+                          </div>
+                          
+                          {/* 3 Dots + Action Menu */}
+                          <div className="absolute top-3 right-3 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
                             <button 
-                              key={cat}
-                              onClick={() => { setGemStudioCategory(cat); setIsCategoryMenuOpen(false); }}
-                              className="w-full text-left px-5 py-3.5 hover:bg-slate-50 border-b border-slate-50 last:border-0 font-medium text-[15px] text-slate-700 hover:text-slate-900 transition-colors"
+                              onClick={(e) => { e.stopPropagation(); setOpenResultMenuId(openResultMenuId === res.id ? null : res.id); }} 
+                              className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white flex items-center justify-center text-slate-700 transition shadow-sm"
                             >
-                              {cat}
+                              <DotsThree size={20} weight="bold" />
                             </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
+                            <AnimatePresence>
+                              {openResultMenuId === res.id && (
+                                <motion.div
+                                  initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                                  exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                                  transition={{ duration: 0.12 }}
+                                  className="absolute top-10 right-0 bg-white border border-slate-200 rounded-[14px] shadow-xl z-50 overflow-hidden w-[190px] py-1"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {[
+                                    { icon: <MagicWand size={16} />, label: 'Modify image' },
+                                    { icon: <VideoCamera size={16} />, label: 'Generate video' },
+                                    { icon: <Images size={16} />, label: 'Save to gallery' },
+                                    { icon: <FolderOpen size={16} />, label: 'Add to folder' },
+                                    { icon: <DownloadSimple size={16} />, label: 'Download' },
+                                  ].map(({ icon, label }) => (
+                                    <button
+                                      key={label}
+                                      className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-slate-50 transition-colors text-left group/item"
+                                      onClick={() => setOpenResultMenuId(null)}
+                                    >
+                                      <span className="text-slate-500 group-hover/item:text-slate-700 transition-colors">{icon}</span>
+                                      <span className="text-[13px] font-medium text-slate-700">{label}</span>
+                                    </button>
+                                  ))}
+                                </motion.div>
+                              )}
+                            </AnimatePresence>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            {/* Bottom Prompt Input */}
+            <div className="absolute bottom-0 left-0 right-0 p-8 pb-10 pointer-events-none">
+              <div className="max-w-[800px] mx-auto pointer-events-auto bg-white rounded-[24px] shadow-[0_4px_30px_rgba(0,0,0,0.08)] border border-slate-200 flex flex-col transition-shadow hover:shadow-[0_8px_40px_rgba(0,0,0,0.12)] relative">
+                
+                {/* Top Row: Photo + Text */}
+                <div className="flex items-center px-4 pt-4 pb-2 gap-3 w-full">
+                  <div className="w-10 h-10 rounded-[8px] overflow-hidden border border-slate-200 shrink-0 relative group">
+                    <img src={gemStudioImage.url} alt="Attached" className="w-full h-full object-cover" />
+                    <button className="absolute top-0.5 right-0.5 bg-black/50 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center hover:bg-black/70">
+                      <X size={10} weight="bold" />
+                    </button>
                   </div>
 
-                  {gemStudioImageStyle ? (
-                    <div className="relative mb-4">
+                  {gemStudioImageStyle && gemStudioStep !== 'results' ? (
+                    <textarea 
+                      value={`Generate ${gemStudioCategory.toLowerCase()} in ${gemStudioImageStyle.name.toLowerCase()} style`}
+                      readOnly
+                      className="flex-1 max-h-32 min-h-[40px] bg-transparent resize-none focus:outline-none text-slate-700 py-2 text-[15px] leading-relaxed self-center"
+                      rows={1}
+                    />
+                  ) : (
+                    <textarea 
+                      placeholder="Describe what you want to generate..."
+                      className="flex-1 max-h-32 min-h-[40px] bg-transparent resize-none focus:outline-none text-slate-400 py-2 text-[15px] leading-relaxed self-center placeholder:text-slate-400"
+                      rows={1}
+                    />
+                  )}
+                </div>
+
+                {/* Bottom Row: Icon + Toggles & Button */}
+                <div className="flex items-center justify-between px-4 pb-3 pt-1 w-full relative">
+                  <div className="flex items-center gap-2 pl-1 z-50">
+                    {/* Category Dropdown */}
+                    <div className="relative">
                       <button 
-                        onClick={() => { setIsStyleMenuOpen(!isStyleMenuOpen); setIsCategoryMenuOpen(false); }}
-                        className="w-full bg-white border border-slate-400/60 rounded-[20px] p-4 flex items-center justify-between hover:border-slate-400 hover:bg-slate-50 transition-all shadow-sm"
+                        onClick={() => { setIsBottomCategoryMenuOpen(!isBottomCategoryMenuOpen); setIsBottomStyleMenuOpen(false); }}
+                        className="text-[13px] font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
                       >
-                        <div className="flex items-center gap-5">
-                          <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden shrink-0 border border-slate-200">
-                            <img src={gemStudioImageStyle.url} alt="Style" className="w-full h-full object-cover" />
-                          </div>
-                          <span className="font-bold text-slate-900 text-[17px]">{gemStudioImageStyle.name}</span>
-                        </div>
-                        <CaretDown size={24} weight="bold" className={`text-slate-400 mr-2 transition-transform ${isStyleMenuOpen ? 'rotate-180' : ''}`} />
+                        {gemStudioCategory.toLowerCase()}
+                        <CaretDown size={12} weight="bold" className={`text-slate-500 transition-transform ${isBottomCategoryMenuOpen ? 'rotate-180' : ''}`} />
                       </button>
-                      
                       <AnimatePresence>
-                        {isStyleMenuOpen && (
+                        {isBottomCategoryMenuOpen && (
                           <motion.div 
-                            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-                            className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-[16px] shadow-lg z-50 overflow-hidden"
+                            initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+                            className="absolute bottom-full left-0 mb-2 bg-white border border-slate-200 rounded-[12px] shadow-xl z-50 overflow-hidden w-[200px]"
                           >
                             {[
-                              { name: 'Standard Close-up', url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80' },
-                              { name: 'Fashion Model', url: 'https://images.unsplash.com/photo-1588636746816-1b48b6f3c051?w=800&q=80' },
-                              { name: 'Casual Elegance', url: 'https://images.unsplash.com/photo-1620054707185-30f14376fb87?w=800&q=80' }
-                            ].map(style => (
+                              { name: 'Model Image', url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80' },
+                              { name: 'Change Gold Color', url: 'https://images.unsplash.com/photo-1585960622850-ed33c41d6418?w=800&q=80' },
+                              { name: 'Lifestyle Image', url: 'https://images.unsplash.com/photo-1590166223826-12dee1677420?w=800&q=80' },
+                              { name: 'Create Video', url: 'https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?w=800&q=80' }
+                            ].map(cat => (
                               <button 
-                                key={style.name}
-                                onClick={() => { setGemStudioImageStyle(style); setIsStyleMenuOpen(false); }}
-                                className="w-full text-left px-5 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-0 flex items-center gap-4 transition-colors"
+                                key={cat.name}
+                                onClick={() => { setGemStudioCategory(cat.name); setIsBottomCategoryMenuOpen(false); }}
+                                className="w-full text-left px-4 py-2 hover:bg-slate-50 border-b border-slate-50 last:border-0 font-medium text-[13px] text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-3"
                               >
-                                <div className="w-[40px] h-[40px] rounded-lg overflow-hidden shrink-0 border border-slate-200">
-                                  <img src={style.url} alt={style.name} className="w-full h-full object-cover" />
+                                <div className="w-6 h-6 rounded bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
+                                  <img src={cat.url} className="w-full h-full object-cover" alt={cat.name} />
                                 </div>
-                                <span className="font-medium text-[15px] text-slate-700 hover:text-slate-900">{style.name}</span>
+                                {cat.name.toLowerCase()}
                               </button>
                             ))}
                           </motion.div>
                         )}
                       </AnimatePresence>
                     </div>
-                  ) : (
-                    <>
-                      <h3 className="font-bold text-slate-900 text-[17px] mb-4 mt-6">Select Model Image Style</h3>
-                      <div className="grid grid-cols-3 gap-5 mb-8">
-                        {/* Option 1 */}
-                        <div 
-                          className="flex flex-col gap-3 cursor-pointer group"
-                          onClick={() => setGemStudioImageStyle({name: 'Standard Close-up', url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80'})}
-                        >
-                          <div className="aspect-square rounded-[20px] overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
-                            <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80" alt="Standard Close-up" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                          </div>
-                          <div className="text-center font-medium text-[15px] text-slate-600 group-hover:text-slate-900 transition-colors">Standard Close-up</div>
-                        </div>
-                        {/* Option 2 */}
-                        <div 
-                          className="flex flex-col gap-3 cursor-pointer group"
-                          onClick={() => setGemStudioImageStyle({name: 'Fashion Model', url: 'https://images.unsplash.com/photo-1588636746816-1b48b6f3c051?w=800&q=80'})}
-                        >
-                          <div className="aspect-square rounded-[20px] overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
-                            <img src="https://images.unsplash.com/photo-1588636746816-1b48b6f3c051?w=800&q=80" alt="Fashion Model" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                          </div>
-                          <div className="text-center font-medium text-[15px] text-slate-600 group-hover:text-slate-900 transition-colors">Fashion Model</div>
-                        </div>
-                        {/* Option 3 */}
-                        <div 
-                          className="flex flex-col gap-3 cursor-pointer group"
-                          onClick={() => setGemStudioImageStyle({name: 'Casual Elegance', url: 'https://images.unsplash.com/photo-1620054707185-30f14376fb87?w=800&q=80'})}
-                        >
-                          <div className="aspect-square rounded-[20px] overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
-                            <img src="https://images.unsplash.com/photo-1620054707185-30f14376fb87?w=800&q=80" alt="Casual Elegance" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                          </div>
-                          <div className="text-center font-medium text-[15px] text-slate-600 group-hover:text-slate-900 transition-colors">Casual Elegance</div>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
 
-            {/* Bottom Prompt Input */}
-            <div className="absolute bottom-0 left-0 right-0 p-8 pb-10 pointer-events-none">
-              <div className="max-w-[800px] mx-auto pointer-events-auto bg-white rounded-[24px] shadow-[0_4px_30px_rgba(0,0,0,0.08)] border border-slate-200 overflow-hidden flex flex-col transition-shadow hover:shadow-[0_8px_40px_rgba(0,0,0,0.12)]">
-                
-                {/* Image Attachment Indicator */}
-                <div className="px-4 pt-4 pb-2 flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shrink-0">
-                    <img src={gemStudioImage.url} alt="Attached" className="w-full h-full object-cover" />
+                    {gemStudioImageStyle && (
+                      <>
+                        <ArrowRight size={14} weight="bold" className="text-slate-400" />
+                        <div className="relative">
+                          <button 
+                            onClick={() => { setIsBottomStyleMenuOpen(!isBottomStyleMenuOpen); setIsBottomCategoryMenuOpen(false); }}
+                            className="text-[13px] font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5"
+                          >
+                            {gemStudioImageStyle.name.toLowerCase()}
+                            <CaretDown size={12} weight="bold" className={`text-slate-500 transition-transform ${isBottomStyleMenuOpen ? 'rotate-180' : ''}`} />
+                          </button>
+                          <AnimatePresence>
+                            {isBottomStyleMenuOpen && (
+                              <motion.div 
+                                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }}
+                                className="absolute bottom-full left-0 mb-2 bg-white border border-slate-200 rounded-[12px] shadow-xl z-50 overflow-hidden w-[200px]"
+                              >
+                                {[
+                                  { name: 'Standard Close-up', url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80' },
+                                  { name: 'Fashion Model', url: 'https://images.unsplash.com/photo-1601121141461-9d6647bca1ed?w=800&q=80' },
+                                  { name: 'Casual Elegance', url: 'https://images.unsplash.com/photo-1599458349289-18f0ee82e6ed?w=800&q=80' }
+                                ].map(style => (
+                                  <button 
+                                    key={style.name}
+                                    onClick={() => { setGemStudioImageStyle(style); setIsBottomStyleMenuOpen(false); }}
+                                    className="w-full text-left px-4 py-2 hover:bg-slate-50 border-b border-slate-50 last:border-0 font-medium text-[13px] text-slate-700 hover:text-slate-900 transition-colors flex items-center gap-3"
+                                  >
+                                    <div className="w-6 h-6 rounded bg-slate-100 overflow-hidden shrink-0 border border-slate-200">
+                                      <img src={style.url} className="w-full h-full object-cover" alt={style.name} />
+                                    </div>
+                                    {style.name.toLowerCase()}
+                                  </button>
+                                ))}
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <span className="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-2">
-                    <Paperclip size={14} /> Attached Photo
-                  </span>
-                </div>
+                  
+                  <div className="flex items-center gap-3">
+                    {/* 9:16 Icon */}
+                    <div className="flex flex-col items-center justify-center gap-[3px] text-slate-500 mr-2">
+                      <div className="w-3 h-[18px] border-[2px] border-current rounded-[3px]"></div>
+                      <span className="text-[11px] font-bold leading-none tracking-tight">9:16</span>
+                    </div>
 
-                <div className="flex items-end px-2 pb-3">
-                  <div className="px-3 pb-2 pt-1 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors">
-                    <Paperclip size={22} />
-                  </div>
-                  <textarea 
-                    placeholder="Message GemStudio or type recommendations..." 
-                    className="flex-1 max-h-32 min-h-[44px] bg-transparent resize-none focus:outline-none text-slate-700 py-2.5 px-2 text-[16px] leading-relaxed"
-                    rows={1}
-                  />
-                  <div className="px-3 pb-1">
-                    <button className="w-10 h-10 bg-[#1cb0b0] text-white rounded-full flex items-center justify-center hover:bg-[#159a9a] transition-all transform hover:scale-105 active:scale-95 shadow-md">
-                      <PaperPlaneRight size={18} weight="fill" />
+                    {/* 1x / 2x / 4x Toggle */}
+                    <div className="flex bg-slate-100/80 p-1 rounded-lg items-center shrink-0">
+                      <button className="px-3 py-1.5 text-[13px] font-semibold rounded-md text-slate-500 hover:text-slate-700 transition-colors">1x</button>
+                      <button className="px-3 py-1.5 text-[13px] font-semibold rounded-md text-slate-500 hover:text-slate-700 transition-colors">2x</button>
+                      <button className="px-3 py-1.5 text-[13px] font-bold rounded-md bg-white text-slate-800 shadow-sm transition-all">4x</button>
+                    </div>
+
+                    <button 
+                      onClick={handleGenerate}
+                      disabled={isGenerating}
+                      className={`rounded-xl px-5 py-2.5 font-semibold flex items-center justify-center transition-all shadow-md whitespace-nowrap text-[14px] ${isGenerating ? 'bg-slate-400 text-white cursor-not-allowed' : 'bg-[#1cb0b0] text-white hover:bg-[#159a9a] transform hover:scale-105 active:scale-95'}`}
+                    >
+                      {isGenerating ? (
+                        <div className="flex items-center gap-2">
+                          <div className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin"></div>
+                          Generating...
+                        </div>
+                      ) : (
+                        'Generate product images'
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1312,6 +1511,42 @@ export default function App() {
             </div>
           </div>
         </div>
+
+        {/* Floating bar for selected generated results */}
+        <AnimatePresence>
+          {selectedResultsCount >= 2 && gemStudioStep === 'results' && (
+            <motion.div
+              initial={{ y: 50, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 50, opacity: 0 }}
+              className="fixed bottom-8 left-1/2 -translate-x-1/2 w-full max-w-[800px] bg-slate-900 text-white px-6 py-4 rounded-xl shadow-2xl flex items-center gap-8 z-[100] pointer-events-auto"
+            >
+              <div className="flex items-center gap-3 border-r border-slate-700 pr-8 shrink-0">
+                <span className="text-sm font-medium text-slate-400">{selectedResultsCount} selected</span>
+              </div>
+
+              <button className="flex items-center gap-2 text-sm font-medium hover:text-[#1cb0b0] transition whitespace-nowrap">
+                <Images size={18} /> Save to gallery
+              </button>
+              <button className="flex items-center gap-2 text-sm font-medium hover:text-[#1cb0b0] transition whitespace-nowrap">
+                <FolderOpen size={18} /> Add to folder
+              </button>
+              <button className="flex items-center gap-2 text-sm font-medium hover:text-[#1cb0b0] transition whitespace-nowrap">
+                <DownloadSimple size={18} /> Download
+              </button>
+              <button className="flex items-center gap-2 text-sm font-medium text-red-400 hover:text-red-300 transition whitespace-nowrap">
+                <Trash size={18} /> Delete
+              </button>
+
+              <button 
+                onClick={() => setGeneratedResults(r => r.map(i => ({ ...i, selected: false })))}
+                className="ml-auto p-1.5 hover:bg-slate-800 rounded-full transition"
+              >
+                <X size={16} className="text-slate-400" />
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       )}
 
