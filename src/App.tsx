@@ -67,6 +67,10 @@ export default function App() {
   const [previewImage, setPreviewImage] = useState<typeof MOCK_IMAGES[0] | null>(null);
   const [gemStudioImage, setGemStudioImage] = useState<typeof MOCK_IMAGES[0] | null>(null);
   const [gemStudioStep, setGemStudioStep] = useState<'options' | 'model_preferences'>('options');
+  const [gemStudioImageStyle, setGemStudioImageStyle] = useState<{name: string, url: string} | null>(null);
+  const [gemStudioCategory, setGemStudioCategory] = useState('Model Image');
+  const [isCategoryMenuOpen, setIsCategoryMenuOpen] = useState(false);
+  const [isStyleMenuOpen, setIsStyleMenuOpen] = useState(false);
 
   const todaysImages = MOCK_IMAGES.filter(img => img.date.includes('Today'));
   const isPreviewToday = previewImage ? todaysImages.some(img => img.id === previewImage.id) : false;
@@ -1094,7 +1098,7 @@ export default function App() {
                     {/* Card 1 */}
                     <div 
                       className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4"
-                      onClick={() => setGemStudioStep('model_preferences')}
+                      onClick={() => { setGemStudioCategory('Model Image'); setGemStudioStep('model_preferences'); }}
                     >
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-slate-900 text-[17px] mb-1">Model Image</h3>
@@ -1106,7 +1110,10 @@ export default function App() {
                     </div>
                     
                     {/* Card 2 */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4">
+                    <div 
+                      className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4"
+                      onClick={() => { setGemStudioCategory('Change Gold Color'); setGemStudioStep('model_preferences'); }}
+                    >
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-slate-900 text-[17px] mb-1">Change Gold Color</h3>
                         <p className="text-[14px] text-slate-500 leading-relaxed pr-2">Change the jewelry's gold color to silver, yellow gold, or rose gold</p>
@@ -1120,7 +1127,10 @@ export default function App() {
                     </div>
 
                     {/* Card 3 */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4">
+                    <div 
+                      className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4"
+                      onClick={() => { setGemStudioCategory('Lifestyle Image'); setGemStudioStep('model_preferences'); }}
+                    >
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-slate-900 text-[17px] mb-1">Lifestyle Image</h3>
                         <p className="text-[14px] text-slate-500 leading-relaxed pr-2">Enhance realism by placing jewelry in natural lifestyle environments</p>
@@ -1131,7 +1141,10 @@ export default function App() {
                     </div>
 
                     {/* Card 4 */}
-                    <div className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4">
+                    <div 
+                      className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4"
+                      onClick={() => { setGemStudioCategory('Create Video'); setGemStudioStep('model_preferences'); }}
+                    >
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-slate-900 text-[17px] mb-1">Create Video</h3>
                         <p className="text-[14px] text-slate-500 leading-relaxed pr-2">Add natural motion to model image</p>
@@ -1148,45 +1161,120 @@ export default function App() {
                   </div>
                 </div>
               ) : (
-                <div className="w-full max-w-[1000px] mt-4">
+                <div className="w-full max-w-[800px] mt-4">
                   {/* Category Selector Card */}
-                  <button 
-                    onClick={() => setGemStudioStep('options')}
-                    className="w-full bg-white border border-slate-400/60 rounded-[24px] p-5 flex items-center justify-between hover:border-slate-400 hover:bg-slate-50 transition-all mb-10 shadow-sm"
-                  >
-                    <div className="flex items-center gap-6">
-                      <div className="w-[84px] h-[84px] rounded-[16px] overflow-hidden shrink-0 border border-slate-200">
-                        <img src={gemStudioImage?.url} alt="Original" className="w-full h-full object-cover" />
+                  <div className="relative mb-4">
+                    <button 
+                      onClick={() => { setIsCategoryMenuOpen(!isCategoryMenuOpen); setIsStyleMenuOpen(false); }}
+                      className="w-full bg-white border border-slate-400/60 rounded-[20px] p-4 flex items-center justify-between hover:border-slate-400 hover:bg-slate-50 transition-all shadow-sm"
+                    >
+                      <div className="flex items-center gap-5">
+                        <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden shrink-0 border border-slate-200">
+                          <img src={gemStudioImage?.url} alt="Original" className="w-full h-full object-cover" />
+                        </div>
+                        <span className="font-bold text-slate-900 text-[17px]">{gemStudioCategory}</span>
                       </div>
-                      <span className="text-[32px] font-normal text-slate-900 tracking-tight">Model image</span>
-                    </div>
-                    <CaretDown size={48} weight="light" className="text-slate-900 mr-2" />
-                  </button>
-
-                  <h3 className="text-[22px] font-bold text-slate-900 mb-6">Select Model Image Style</h3>
-                  <div className="grid grid-cols-3 gap-6">
-                    {/* Option 1 */}
-                    <div className="flex flex-col gap-4 cursor-pointer group">
-                      <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
-                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80" alt="Standard Close-up" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      </div>
-                      <div className="text-center font-medium text-[17px] text-slate-600 group-hover:text-slate-900 transition-colors">Standard Close-up</div>
-                    </div>
-                    {/* Option 2 */}
-                    <div className="flex flex-col gap-4 cursor-pointer group">
-                      <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
-                        <img src="https://images.unsplash.com/photo-1588636746816-1b48b6f3c051?w=800&q=80" alt="Fashion Model" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      </div>
-                      <div className="text-center font-medium text-[17px] text-slate-600 group-hover:text-slate-900 transition-colors">Fashion Model</div>
-                    </div>
-                    {/* Option 3 */}
-                    <div className="flex flex-col gap-4 cursor-pointer group">
-                      <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
-                        <img src="https://images.unsplash.com/photo-1620054707185-30f14376fb87?w=800&q=80" alt="Casual Elegance" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      </div>
-                      <div className="text-center font-medium text-[17px] text-slate-600 group-hover:text-slate-900 transition-colors">Casual Elegance</div>
-                    </div>
+                      <CaretDown size={24} weight="bold" className={`text-slate-400 mr-2 transition-transform ${isCategoryMenuOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    
+                    <AnimatePresence>
+                      {isCategoryMenuOpen && (
+                        <motion.div 
+                          initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                          className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-[16px] shadow-lg z-50 overflow-hidden"
+                        >
+                          {['Model Image', 'Change Gold Color', 'Lifestyle Image', 'Create Video'].map(cat => (
+                            <button 
+                              key={cat}
+                              onClick={() => { setGemStudioCategory(cat); setIsCategoryMenuOpen(false); }}
+                              className="w-full text-left px-5 py-3.5 hover:bg-slate-50 border-b border-slate-50 last:border-0 font-medium text-[15px] text-slate-700 hover:text-slate-900 transition-colors"
+                            >
+                              {cat}
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </div>
+
+                  {gemStudioImageStyle ? (
+                    <div className="relative mb-4">
+                      <button 
+                        onClick={() => { setIsStyleMenuOpen(!isStyleMenuOpen); setIsCategoryMenuOpen(false); }}
+                        className="w-full bg-white border border-slate-400/60 rounded-[20px] p-4 flex items-center justify-between hover:border-slate-400 hover:bg-slate-50 transition-all shadow-sm"
+                      >
+                        <div className="flex items-center gap-5">
+                          <div className="w-[64px] h-[64px] rounded-[12px] overflow-hidden shrink-0 border border-slate-200">
+                            <img src={gemStudioImageStyle.url} alt="Style" className="w-full h-full object-cover" />
+                          </div>
+                          <span className="font-bold text-slate-900 text-[17px]">{gemStudioImageStyle.name}</span>
+                        </div>
+                        <CaretDown size={24} weight="bold" className={`text-slate-400 mr-2 transition-transform ${isStyleMenuOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      <AnimatePresence>
+                        {isStyleMenuOpen && (
+                          <motion.div 
+                            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+                            className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-[16px] shadow-lg z-50 overflow-hidden"
+                          >
+                            {[
+                              { name: 'Standard Close-up', url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80' },
+                              { name: 'Fashion Model', url: 'https://images.unsplash.com/photo-1588636746816-1b48b6f3c051?w=800&q=80' },
+                              { name: 'Casual Elegance', url: 'https://images.unsplash.com/photo-1620054707185-30f14376fb87?w=800&q=80' }
+                            ].map(style => (
+                              <button 
+                                key={style.name}
+                                onClick={() => { setGemStudioImageStyle(style); setIsStyleMenuOpen(false); }}
+                                className="w-full text-left px-5 py-3 hover:bg-slate-50 border-b border-slate-50 last:border-0 flex items-center gap-4 transition-colors"
+                              >
+                                <div className="w-[40px] h-[40px] rounded-lg overflow-hidden shrink-0 border border-slate-200">
+                                  <img src={style.url} alt={style.name} className="w-full h-full object-cover" />
+                                </div>
+                                <span className="font-medium text-[15px] text-slate-700 hover:text-slate-900">{style.name}</span>
+                              </button>
+                            ))}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                    </div>
+                  ) : (
+                    <>
+                      <h3 className="font-bold text-slate-900 text-[17px] mb-4 mt-6">Select Model Image Style</h3>
+                      <div className="grid grid-cols-3 gap-5 mb-8">
+                        {/* Option 1 */}
+                        <div 
+                          className="flex flex-col gap-3 cursor-pointer group"
+                          onClick={() => setGemStudioImageStyle({name: 'Standard Close-up', url: 'https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80'})}
+                        >
+                          <div className="aspect-square rounded-[20px] overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
+                            <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80" alt="Standard Close-up" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          </div>
+                          <div className="text-center font-medium text-[15px] text-slate-600 group-hover:text-slate-900 transition-colors">Standard Close-up</div>
+                        </div>
+                        {/* Option 2 */}
+                        <div 
+                          className="flex flex-col gap-3 cursor-pointer group"
+                          onClick={() => setGemStudioImageStyle({name: 'Fashion Model', url: 'https://images.unsplash.com/photo-1588636746816-1b48b6f3c051?w=800&q=80'})}
+                        >
+                          <div className="aspect-square rounded-[20px] overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
+                            <img src="https://images.unsplash.com/photo-1588636746816-1b48b6f3c051?w=800&q=80" alt="Fashion Model" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          </div>
+                          <div className="text-center font-medium text-[15px] text-slate-600 group-hover:text-slate-900 transition-colors">Fashion Model</div>
+                        </div>
+                        {/* Option 3 */}
+                        <div 
+                          className="flex flex-col gap-3 cursor-pointer group"
+                          onClick={() => setGemStudioImageStyle({name: 'Casual Elegance', url: 'https://images.unsplash.com/photo-1620054707185-30f14376fb87?w=800&q=80'})}
+                        >
+                          <div className="aspect-square rounded-[20px] overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
+                            <img src="https://images.unsplash.com/photo-1620054707185-30f14376fb87?w=800&q=80" alt="Casual Elegance" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          </div>
+                          <div className="text-center font-medium text-[15px] text-slate-600 group-hover:text-slate-900 transition-colors">Casual Elegance</div>
+                        </div>
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
