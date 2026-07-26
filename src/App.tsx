@@ -7,7 +7,8 @@ import {
   MagnifyingGlass, House, Tray, Question, UploadSimple,
   FolderOpen, Eye, DownloadSimple, EnvelopeSimple, X,
   DotsThree, Plus, Diamond, ShareNetwork, ShoppingBag,
-  Scissors, Ruler, TextT, ImageSquare, Broom, Info, Crop, CaretLeft, ArrowRight
+  Scissors, Ruler, TextT, ImageSquare, Broom, Info, Crop, CaretLeft, ArrowRight,
+  ChatCircle, Paperclip, PaperPlaneRight, CaretDown
 } from '@phosphor-icons/react';
 
 const MOCK_IMAGES = [
@@ -43,7 +44,6 @@ const PRESETS = [
   { id: 'model', name: 'On Model (Lifestyle)', icon: '👩', desc: 'AI generated hand wearing the ring' }
 ];
 
-
 export default function App() {
   const [view, setView] = useState<'media' | 'studio' | 'results'>('media');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -65,6 +65,8 @@ export default function App() {
   const [editingName, setEditingName] = useState('');
   const [openMenuId, setOpenMenuId] = useState<number | null>(null);
   const [previewImage, setPreviewImage] = useState<typeof MOCK_IMAGES[0] | null>(null);
+  const [gemStudioImage, setGemStudioImage] = useState<typeof MOCK_IMAGES[0] | null>(null);
+  const [gemStudioStep, setGemStudioStep] = useState<'options' | 'model_preferences'>('options');
 
   const todaysImages = MOCK_IMAGES.filter(img => img.date.includes('Today'));
   const isPreviewToday = previewImage ? todaysImages.some(img => img.id === previewImage.id) : false;
@@ -135,7 +137,15 @@ export default function App() {
         <span className="text-[11px] text-slate-400 pl-7 leading-tight">Crop, resize, measure, add text, logo, adjust, erase...</span>
       </button>
 
-      <button className="w-full text-left px-4 py-2 hover:bg-[#ecf7f8] flex flex-col gap-0.5 transition-colors group">
+      <button 
+        className="w-full text-left px-4 py-2 hover:bg-[#ecf7f8] flex flex-col gap-0.5 transition-colors group"
+        onClick={(e) => {
+          e.stopPropagation();
+          setGemStudioImage(img);
+          setGemStudioStep('options');
+          setOpenMenuId(null);
+        }}
+      >
         <div className="flex items-center gap-3 text-sm font-medium text-[#1cb0b0]">
           <Sparkle size={16} weight="fill" /> Edit with AI (GemStudio)
         </div>
@@ -1023,6 +1033,200 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
+      {/* GemStudio Full-Screen View */}
+      {gemStudioImage && (
+        <div className="fixed inset-0 z-[200] bg-white flex flex-col h-screen text-slate-800 animate-in fade-in duration-200">
+          {/* Header (Full Width & Static) */}
+          <div className="h-[72px] px-6 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white relative z-10 w-full">
+            <button 
+              onClick={() => { setGemStudioImage(null); setGemStudioStep('options'); }}
+              className="flex items-center gap-2 text-slate-500 hover:text-slate-800 hover:bg-slate-50 transition-colors font-medium text-[15px] px-3 py-2 rounded-lg"
+            >
+              <ArrowLeft size={18} /> Go back to Gem IQ
+            </button>
+            
+            <h2 className="text-[22px] font-bold text-slate-800 flex items-center gap-2 absolute left-1/2 -translate-x-1/2">
+              <Sparkle size={26} weight="fill" className="text-[#1cb0b0]" /> GemStudio
+            </h2>
+            
+            <div className="w-[180px]"></div> {/* Spacer */}
+          </div>
+
+          {/* Main Layout Area */}
+          <div className="flex-1 flex overflow-hidden">
+            {/* Sidebar */}
+            <div className="w-[260px] bg-slate-50 border-r border-slate-200 flex flex-col shrink-0">
+              <div className="p-4">
+                <button className="w-full flex items-center justify-center gap-2 border border-slate-200 hover:bg-slate-100 text-slate-700 py-2.5 rounded-[12px] font-medium transition-colors shadow-sm">
+                  <Plus size={18} weight="bold" /> New Project
+                </button>
+              </div>
+              
+              <div className="px-5 py-3 text-xs font-bold text-slate-400 uppercase tracking-wider mt-2">
+                Recent
+              </div>
+              
+              <div className="flex-1 overflow-y-auto px-3 space-y-1">
+                {/* Active Chat */}
+                <button className="w-full flex items-center px-3 py-2.5 rounded-lg bg-slate-200 text-left font-medium text-slate-800 transition-colors">
+                  <span className="truncate">{gemStudioImage.name}</span>
+                </button>
+                
+                {/* Mock Inactive Chats */}
+                <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-left hover:bg-slate-100 font-medium text-slate-600 hover:text-slate-800 transition-colors">
+                  <span className="truncate">Platinum Band Render</span>
+                </button>
+                <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-left hover:bg-slate-100 font-medium text-slate-600 hover:text-slate-800 transition-colors">
+                  <span className="truncate">Sapphire Necklace Concept</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Main Workspace (Workspace content) */}
+            <div className="flex-1 flex flex-col relative bg-white">
+
+
+            {/* Scrollable Center Content */}
+            <div className="flex-1 overflow-y-auto px-12 py-12 pb-40 flex justify-center">
+              {gemStudioStep === 'options' ? (
+                <div className="w-full max-w-[900px]">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Card 1 */}
+                    <div 
+                      className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4"
+                      onClick={() => setGemStudioStep('model_preferences')}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-slate-900 text-[17px] mb-1">Model Image</h3>
+                        <p className="text-[14px] text-slate-500 leading-relaxed pr-2">Create hyper-realistic model image based on a jewelry image</p>
+                      </div>
+                      <div className="w-16 h-16 rounded-[14px] bg-slate-100 overflow-hidden shrink-0 relative">
+                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80" alt="Model" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                    </div>
+                    
+                    {/* Card 2 */}
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-slate-900 text-[17px] mb-1">Change Gold Color</h3>
+                        <p className="text-[14px] text-slate-500 leading-relaxed pr-2">Change the jewelry's gold color to silver, yellow gold, or rose gold</p>
+                      </div>
+                      <div className="w-16 h-16 rounded-[14px] bg-slate-100 overflow-hidden shrink-0 relative flex items-center justify-center">
+                        <div className="absolute inset-0 flex">
+                          <img src="https://images.unsplash.com/photo-1599643471711-c752015822f7?w=800&q=80" alt="Gold" className="w-1/2 h-full object-cover group-hover:scale-105 transition-transform duration-500 origin-left" />
+                          <img src="https://images.unsplash.com/photo-1599643471711-c752015822f7?w=800&q=80&sat=-100" alt="Silver" className="w-1/2 h-full object-cover group-hover:scale-105 transition-transform duration-500 origin-right" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Card 3 */}
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-slate-900 text-[17px] mb-1">Lifestyle Image</h3>
+                        <p className="text-[14px] text-slate-500 leading-relaxed pr-2">Enhance realism by placing jewelry in natural lifestyle environments</p>
+                      </div>
+                      <div className="w-16 h-16 rounded-[14px] bg-slate-100 overflow-hidden shrink-0 relative">
+                        <img src="https://images.unsplash.com/photo-1605100804763-247f66150ce8?w=800&q=80" alt="Lifestyle" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                    </div>
+
+                    {/* Card 4 */}
+                    <div className="bg-white rounded-2xl p-5 border border-slate-200 hover:border-[#1cb0b0] hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all cursor-pointer group flex items-center justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-bold text-slate-900 text-[17px] mb-1">Create Video</h3>
+                        <p className="text-[14px] text-slate-500 leading-relaxed pr-2">Add natural motion to model image</p>
+                      </div>
+                      <div className="w-16 h-16 rounded-[14px] bg-slate-100 overflow-hidden shrink-0 relative flex items-center justify-center">
+                        <img src="https://images.unsplash.com/photo-1611591437281-460bfbe1220a?w=800&q=80" alt="Video" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
+                          <div className="w-6 h-6 bg-white/90 rounded-full flex items-center justify-center backdrop-blur-md shadow-sm">
+                            <div className="w-0 h-0 border-t-[4px] border-t-transparent border-l-[6px] border-l-[#1cb0b0] border-b-[4px] border-b-transparent ml-0.5"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="w-full max-w-[1000px] mt-4">
+                  {/* Category Selector Card */}
+                  <button 
+                    onClick={() => setGemStudioStep('options')}
+                    className="w-full bg-white border border-slate-400/60 rounded-[24px] p-5 flex items-center justify-between hover:border-slate-400 hover:bg-slate-50 transition-all mb-10 shadow-sm"
+                  >
+                    <div className="flex items-center gap-6">
+                      <div className="w-[84px] h-[84px] rounded-[16px] overflow-hidden shrink-0 border border-slate-200">
+                        <img src={gemStudioImage?.url} alt="Original" className="w-full h-full object-cover" />
+                      </div>
+                      <span className="text-[32px] font-normal text-slate-900 tracking-tight">Model image</span>
+                    </div>
+                    <CaretDown size={48} weight="light" className="text-slate-900 mr-2" />
+                  </button>
+
+                  <h3 className="text-[22px] font-bold text-slate-900 mb-6">Select Model Image Style</h3>
+                  <div className="grid grid-cols-3 gap-6">
+                    {/* Option 1 */}
+                    <div className="flex flex-col gap-4 cursor-pointer group">
+                      <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
+                        <img src="https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=800&q=80" alt="Standard Close-up" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                      <div className="text-center font-medium text-[17px] text-slate-600 group-hover:text-slate-900 transition-colors">Standard Close-up</div>
+                    </div>
+                    {/* Option 2 */}
+                    <div className="flex flex-col gap-4 cursor-pointer group">
+                      <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
+                        <img src="https://images.unsplash.com/photo-1588636746816-1b48b6f3c051?w=800&q=80" alt="Fashion Model" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                      <div className="text-center font-medium text-[17px] text-slate-600 group-hover:text-slate-900 transition-colors">Fashion Model</div>
+                    </div>
+                    {/* Option 3 */}
+                    <div className="flex flex-col gap-4 cursor-pointer group">
+                      <div className="aspect-square rounded-2xl overflow-hidden bg-slate-100 relative shadow-sm group-hover:shadow-md transition-all">
+                        <img src="https://images.unsplash.com/photo-1620054707185-30f14376fb87?w=800&q=80" alt="Casual Elegance" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      </div>
+                      <div className="text-center font-medium text-[17px] text-slate-600 group-hover:text-slate-900 transition-colors">Casual Elegance</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Prompt Input */}
+            <div className="absolute bottom-0 left-0 right-0 p-8 pb-10 pointer-events-none">
+              <div className="max-w-[800px] mx-auto pointer-events-auto bg-white rounded-[24px] shadow-[0_4px_30px_rgba(0,0,0,0.08)] border border-slate-200 overflow-hidden flex flex-col transition-shadow hover:shadow-[0_8px_40px_rgba(0,0,0,0.12)]">
+                
+                {/* Image Attachment Indicator */}
+                <div className="px-4 pt-4 pb-2 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shrink-0">
+                    <img src={gemStudioImage.url} alt="Attached" className="w-full h-full object-cover" />
+                  </div>
+                  <span className="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full flex items-center gap-2">
+                    <Paperclip size={14} /> Attached Photo
+                  </span>
+                </div>
+
+                <div className="flex items-end px-2 pb-3">
+                  <div className="px-3 pb-2 pt-1 text-slate-400 hover:text-slate-600 cursor-pointer transition-colors">
+                    <Paperclip size={22} />
+                  </div>
+                  <textarea 
+                    placeholder="Message GemStudio or type recommendations..." 
+                    className="flex-1 max-h-32 min-h-[44px] bg-transparent resize-none focus:outline-none text-slate-700 py-2.5 px-2 text-[16px] leading-relaxed"
+                    rows={1}
+                  />
+                  <div className="px-3 pb-1">
+                    <button className="w-10 h-10 bg-[#1cb0b0] text-white rounded-full flex items-center justify-center hover:bg-[#159a9a] transition-all transform hover:scale-105 active:scale-95 shadow-md">
+                      <PaperPlaneRight size={18} weight="fill" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      )}
+
     </div>
   );
 }
